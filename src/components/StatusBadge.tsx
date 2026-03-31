@@ -10,15 +10,15 @@ export function StatusBadge({ status }: { status: Status }) {
 }
 
 export function CatBadge({ cat }: { cat: string }) {
-  let cls = 'cat-4'
+  let cls = 'cat-5'
   if (cat === 'Cat 1') cls = 'cat-1'
   else if (cat === 'Cat 2') cls = 'cat-2'
-  else if (cat === 'Cat 3A') cls = 'cat-3a'
-  else if (cat === 'Cat 3B') cls = 'cat-3b'
-  else if (cat === 'Cat 3C') cls = 'cat-3c'
-  else if (cat === 'Cat 3D') cls = 'cat-3d'
-  else if (cat === 'Cat 3E') cls = 'cat-3e'
-  else if (cat.startsWith('Cat 3')) cls = 'cat-3'
+  else if (cat === 'Cat 3') cls = 'cat-3'
+  else if (cat === 'Cat 4A') cls = 'cat-4a'
+  else if (cat === 'Cat 4B') cls = 'cat-4b'
+  else if (cat === 'Cat 4C') cls = 'cat-4c'
+  else if (cat === 'Cat 4D') cls = 'cat-4d'
+  else if (cat.startsWith('Cat 4')) cls = 'cat-4'
   return (
     <span className={`${cls} inline-block px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap`}>
       {cat}

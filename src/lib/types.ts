@@ -24,12 +24,12 @@ export const STATUS_ORDER: Status[] = [
 export const CATEGORY_LABELS: Record<string, string> = {
   'Cat 1':  'Cat 1 - Fix Existing Issues',
   'Cat 2':  'Cat 2 - Feature Backlog',
-  'Cat 3A': 'Cat 3A - ArcGIS Departure and Platform Rebuild',
-  'Cat 3B': 'Cat 3B - Platform Foundation and Maps',
-  'Cat 3C': 'Cat 3C - Data and Financial Integrations',
-  'Cat 3D': 'Cat 3D - Automation, Notifications, and Compliance',
-  'Cat 3E': 'Cat 3E - Advanced Analytics and Reporting',
-  'Cat 4':  'Cat 4 - Ongoing Support',
+  'Cat 3':  'Cat 3 - ArcGIS Departure and Native iPad Application',
+  'Cat 4A': 'Cat 4A - Platform Foundation and Maps',
+  'Cat 4B': 'Cat 4B - Data and Financial Integrations',
+  'Cat 4C': 'Cat 4C - Automation, Notifications, and Compliance',
+  'Cat 4D': 'Cat 4D - Forms and Platform Enhancements',
+  'Cat 5':  'Cat 5 - Ongoing Support',
 }
 
 export interface WorkItem {

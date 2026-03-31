@@ -17,12 +17,12 @@ const STATUS_COLORS: Record<Status, string> = {
 const CAT_COLORS: Record<string, string> = {
   'Cat 1':  '#c82020',
   'Cat 2':  '#3472c8',
-  'Cat 3A': '#4a08a0',
-  'Cat 3B': '#6020a0',
-  'Cat 3C': '#2830b8',
-  'Cat 3D': '#a01060',
-  'Cat 3E': '#a03010',
-  'Cat 4':  '#5a6080',
+  'Cat 3':  '#4a08a0',
+  'Cat 4A': '#6020a0',
+  'Cat 4B': '#2830b8',
+  'Cat 4C': '#a01060',
+  'Cat 4D': '#a03010',
+  'Cat 5':  '#5a6080',
 }
 
 export function DashboardPage() {
@@ -38,7 +38,7 @@ export function DashboardPage() {
 
   if (loading) return <div style={{ color: '#7080a0', padding: 32 }}>Loading...</div>
 
-  const billable = items.filter(i => i.category !== 'Cat 4')
+  const billable = items.filter(i => i.category !== 'Cat 5')
   const totalLo = billable.reduce((s, i) => s + (i.quoted_value_lo ?? 0), 0)
   const totalHi = billable.reduce((s, i) => s + (i.quoted_value_hi ?? 0), 0)
   const completedValue = billable
@@ -52,7 +52,7 @@ export function DashboardPage() {
   }, {})
 
   // Build category breakdown -- only show categories that have items
-  const catKeys = ['Cat 1', 'Cat 2', 'Cat 3A', 'Cat 3B', 'Cat 3C', 'Cat 3D', 'Cat 3E', 'Cat 4']
+  const catKeys = ['Cat 1', 'Cat 2', 'Cat 3', 'Cat 4A', 'Cat 4B', 'Cat 4C', 'Cat 4D', 'Cat 5']
   const byCategory = catKeys
     .map(cat => {
       const catItems = items.filter(i => i.category === cat)

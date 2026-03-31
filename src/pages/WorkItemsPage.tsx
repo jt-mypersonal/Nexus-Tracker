@@ -6,7 +6,7 @@ import { StatusBadge, CatBadge, NqStatusBadge, CrStatusBadge } from '../componen
 import { ItemDetailDrawer } from '../components/ItemDetailDrawer'
 import { ChangeRequestModal } from '../components/ChangeRequestModal'
 
-const CATEGORIES = ['All', 'Cat 1', 'Cat 2', 'Cat 3A', 'Cat 3B', 'Cat 3C', 'Cat 3D', 'Cat 3E', 'Cat 4']
+const CATEGORIES = ['All', 'Cat 1', 'Cat 2', 'Cat 3', 'Cat 4A', 'Cat 4B', 'Cat 4C', 'Cat 4D', 'Cat 5']
 const STATUSES: Array<'All' | Status> = ['All', ...STATUS_ORDER]
 
 type MainTab = 'items' | 'nq' | 'cr'

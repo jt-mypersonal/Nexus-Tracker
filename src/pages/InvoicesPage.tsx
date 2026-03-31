@@ -107,8 +107,12 @@ export function InvoicesPage() {
                 <option value="">All</option>
                 <option value="Cat 1">Cat 1 - Fix Existing Issues</option>
                 <option value="Cat 2">Cat 2 - Feature Backlog</option>
-                <option value="Cat 3">Cat 3 - Phase II Core</option>
-                <option value="Cat 4">Cat 4 - Ongoing Support</option>
+                <option value="Cat 3">Cat 3 - ArcGIS Departure and Native iPad Application</option>
+                <option value="Cat 4A">Cat 4A - Platform Foundation and Maps</option>
+                <option value="Cat 4B">Cat 4B - Data and Financial Integrations</option>
+                <option value="Cat 4C">Cat 4C - Automation, Notifications, and Compliance</option>
+                <option value="Cat 4D">Cat 4D - Forms and Platform Enhancements</option>
+                <option value="Cat 5">Cat 5 - Ongoing Support</option>
               </select>
             </div>
             <div>
