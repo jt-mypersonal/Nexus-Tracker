@@ -300,13 +300,7 @@ export function WorkItemsPage() {
       {mainTab === 'nq' && (
         <>
           <div style={{ background: '#fff8e4', border: '1px solid #f0d880', borderRadius: 8, padding: '10px 16px', marginBottom: 20, fontSize: 13, color: '#6a4800' }}>
-            Complimentary work delivered outside the Phase 2 proposal scope -- no charge to NexusIntegrity.
-            {nqItems.length > 0 && (
-              <strong>
-                {' '}Estimated value:{' '}
-                ${Math.round(nqItems.reduce((s, i) => s + ((i.est_value_lo ?? 0) + (i.est_value_hi ?? 0)) / 2, 0)).toLocaleString()}
-              </strong>
-            )}
+            Work delivered outside the Phase 2 proposal scope at no charge to NexusIntegrity. This includes improvements, fixes, and recommendations identified during development.
           </div>
 
           {!nqLoaded && <div style={{ color: '#9aa5be', padding: 24 }}>Loading...</div>}
@@ -319,14 +313,12 @@ export function WorkItemsPage() {
                 <colgroup>
                   <col style={{ width: 80 }} />
                   <col />
-                  <col style={{ width: 80 }} />
-                  <col style={{ width: 110 }} />
-                  <col style={{ width: 145 }} />
-                  <col style={{ width: 110 }} />
+                  <col style={{ width: 100 }} />
+                  <col style={{ width: 120 }} />
                 </colgroup>
                 <thead>
                   <tr style={{ background: '#1a2744' }}>
-                    {['ID', 'Item', 'Category', 'Est Hours', 'Est Value', 'Status'].map(h => (
+                    {['ID', 'Item', 'Category', 'Status'].map(h => (
                       <th key={h} style={{ padding: '9px 13px', fontSize: 11, fontWeight: 600, color: '#adc4e0', letterSpacing: '0.06em', textTransform: 'uppercase', textAlign: 'left', border: '1px solid #2a3a60' }}>
                         {h}
                       </th>
@@ -349,16 +341,6 @@ export function WorkItemsPage() {
                         <span style={{ fontSize: 11, fontWeight: 600, color: '#4a5580', background: '#f0f2f7', borderRadius: 4, padding: '2px 7px' }}>
                           {nq.category}
                         </span>
-                      </td>
-                      <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', color: '#4a5580', whiteSpace: 'nowrap' }}>
-                        {nq.est_hrs_lo == null ? '--' :
-                          nq.est_hrs_lo === nq.est_hrs_hi ? `${nq.est_hrs_lo} hrs` : `${nq.est_hrs_lo} - ${nq.est_hrs_hi} hrs`}
-                      </td>
-                      <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', fontWeight: 600, color: '#1a4090', whiteSpace: 'nowrap' }}>
-                        {nq.est_value_lo == null ? '--' :
-                          nq.est_value_lo === nq.est_value_hi
-                            ? `$${nq.est_value_lo?.toLocaleString()}`
-                            : `$${nq.est_value_lo?.toLocaleString()} - $${nq.est_value_hi?.toLocaleString()}`}
                       </td>
                       <td style={{ padding: '9px 13px', border: '1px solid #dce2ef' }}>
                         <NqStatusBadge status={nq.status} />
