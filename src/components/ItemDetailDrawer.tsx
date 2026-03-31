@@ -45,6 +45,11 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
   const [timerLoading, setTimerLoading] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  // Inline duration editing
+  const [editingEntryId, setEditingEntryId] = useState<string | null>(null)
+  const [editHours, setEditHours] = useState('')
+  const [editMins, setEditMins] = useState('')
+
   useEffect(() => {
     loadUat()
     loadNotes()
@@ -192,6 +197,24 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
     setActiveEntry(null)
     setTimerNote('')
     setTimerLoading(false)
+  }
+
+  function startEditDuration(e: TimeEntry) {
+    const h = Math.floor((e.duration_minutes ?? 0) / 60)
+    const m = (e.duration_minutes ?? 0) % 60
+    setEditHours(h > 0 ? String(h) : '')
+    setEditMins(String(m))
+    setEditingEntryId(e.id)
+  }
+
+  async function saveDuration(entryId: string) {
+    const h = parseInt(editHours || '0', 10)
+    const m = parseInt(editMins || '0', 10)
+    const total = h * 60 + m
+    if (isNaN(total) || total < 1) { setEditingEntryId(null); return }
+    await supabase.from('time_entries').update({ duration_minutes: total }).eq('id', entryId)
+    setTimeEntries(prev => prev.map(e => e.id === entryId ? { ...e, duration_minutes: total } : e))
+    setEditingEntryId(null)
   }
 
   const totalMinutes = timeEntries
@@ -457,22 +480,59 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
                     Past Sessions
                   </div>
                   <div className="flex flex-col gap-2">
-                    {timeEntries.filter(e => e.stopped_at !== null).map(e => (
-                      <div key={e.id} style={{ background: '#f8f9fc', borderRadius: 6, padding: '9px 14px' }}>
-                        <div className="flex items-center justify-between">
-                          <span style={{ fontSize: 12, fontWeight: 700, color: '#1a2744' }}>
-                            {fmtDuration(e.duration_minutes)}
-                          </span>
-                          <span style={{ fontSize: 11, color: '#9aa5be' }}>
-                            {new Date(e.started_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                          </span>
+                    {timeEntries.filter(e => e.stopped_at !== null).map(e => {
+                      const isOwn = e.logged_by === user?.email
+                      const isEditing = editingEntryId === e.id
+                      return (
+                        <div key={e.id} style={{ background: '#f8f9fc', borderRadius: 6, padding: '9px 14px' }}>
+                          <div className="flex items-center justify-between">
+                            {isEditing ? (
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  value={editHours}
+                                  onChange={e2 => setEditHours(e2.target.value)}
+                                  onKeyDown={e2 => { if (e2.key === 'Enter') saveDuration(e.id); if (e2.key === 'Escape') setEditingEntryId(null) }}
+                                  placeholder="0"
+                                  autoFocus
+                                  style={{ width: 40, border: '1px solid #3472c8', borderRadius: 4, padding: '2px 5px', fontSize: 12, textAlign: 'center' }}
+                                />
+                                <span style={{ fontSize: 12, color: '#7080a0' }}>h</span>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={59}
+                                  value={editMins}
+                                  onChange={e2 => setEditMins(e2.target.value)}
+                                  onKeyDown={e2 => { if (e2.key === 'Enter') saveDuration(e.id); if (e2.key === 'Escape') setEditingEntryId(null) }}
+                                  placeholder="0"
+                                  style={{ width: 40, border: '1px solid #3472c8', borderRadius: 4, padding: '2px 5px', fontSize: 12, textAlign: 'center' }}
+                                />
+                                <span style={{ fontSize: 12, color: '#7080a0' }}>m</span>
+                                <button onClick={() => saveDuration(e.id)} style={{ fontSize: 11, color: '#fff', background: '#3472c8', border: 'none', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', marginLeft: 2 }}>Save</button>
+                                <button onClick={() => setEditingEntryId(null)} style={{ fontSize: 11, color: '#7080a0', background: 'none', border: 'none', cursor: 'pointer' }}>Cancel</button>
+                              </div>
+                            ) : (
+                              <span
+                                style={{ fontSize: 12, fontWeight: 700, color: '#1a2744', cursor: isOwn ? 'pointer' : 'default', borderBottom: isOwn ? '1px dashed #9aa5be' : 'none' }}
+                                title={isOwn ? 'Click to edit duration' : undefined}
+                                onClick={() => isOwn && startEditDuration(e)}
+                              >
+                                {fmtDuration(e.duration_minutes)}
+                              </span>
+                            )}
+                            <span style={{ fontSize: 11, color: '#9aa5be' }}>
+                              {new Date(e.started_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                          </div>
+                          {e.notes && (
+                            <div style={{ fontSize: 12, color: '#4a5580', marginTop: 4 }}>{e.notes}</div>
+                          )}
+                          <div style={{ fontSize: 11, color: '#9aa5be', marginTop: 3 }}>{e.logged_by}</div>
                         </div>
-                        {e.notes && (
-                          <div style={{ fontSize: 12, color: '#4a5580', marginTop: 4 }}>{e.notes}</div>
-                        )}
-                        <div style={{ fontSize: 11, color: '#9aa5be', marginTop: 3 }}>{e.logged_by}</div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               )}
