@@ -14,6 +14,17 @@ const STATUS_COLORS: Record<Status, string> = {
   paid:        '#0a5030',
 }
 
+const CAT_COLORS: Record<string, string> = {
+  'Cat 1':  '#c82020',
+  'Cat 2':  '#3472c8',
+  'Cat 3A': '#4a08a0',
+  'Cat 3B': '#6020a0',
+  'Cat 3C': '#2830b8',
+  'Cat 3D': '#a01060',
+  'Cat 3E': '#a03010',
+  'Cat 4':  '#5a6080',
+}
+
 export function DashboardPage() {
   const [items, setItems] = useState<WorkItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,7 +41,9 @@ export function DashboardPage() {
   const billable = items.filter(i => i.category !== 'Cat 4')
   const totalLo = billable.reduce((s, i) => s + (i.quoted_value_lo ?? 0), 0)
   const totalHi = billable.reduce((s, i) => s + (i.quoted_value_hi ?? 0), 0)
-  const completedValue = billable.filter(i => ['complete', 'invoiced', 'paid'].includes(i.status)).reduce((s, i) => s + ((i.quoted_value_lo ?? 0) + (i.quoted_value_hi ?? 0)) / 2, 0)
+  const completedValue = billable
+    .filter(i => ['complete', 'invoiced', 'paid'].includes(i.status))
+    .reduce((s, i) => s + ((i.quoted_value_lo ?? 0) + (i.quoted_value_hi ?? 0)) / 2, 0)
   const pct = totalLo > 0 ? Math.round((completedValue / ((totalLo + totalHi) / 2)) * 100) : 0
 
   const byStatus = items.reduce<Record<string, WorkItem[]>>((acc, i) => {
@@ -38,21 +51,27 @@ export function DashboardPage() {
     return acc
   }, {})
 
-  const byCategory = ['Cat 1', 'Cat 2', 'Cat 3', 'Cat 4'].map(cat => ({
-    cat,
-    items: items.filter(i => i.category === cat),
-    done: items.filter(i => i.category === cat && ['complete', 'invoiced', 'paid'].includes(i.status)).length,
-    total: items.filter(i => i.category === cat).length,
-    valueLo: items.filter(i => i.category === cat).reduce((s, i) => s + (i.quoted_value_lo ?? 0), 0),
-    valueHi: items.filter(i => i.category === cat).reduce((s, i) => s + (i.quoted_value_hi ?? 0), 0),
-  }))
+  // Build category breakdown -- only show categories that have items
+  const catKeys = ['Cat 1', 'Cat 2', 'Cat 3A', 'Cat 3B', 'Cat 3C', 'Cat 3D', 'Cat 3E', 'Cat 4']
+  const byCategory = catKeys
+    .map(cat => {
+      const catItems = items.filter(i => i.category === cat)
+      return {
+        cat,
+        total: catItems.length,
+        done: catItems.filter(i => ['complete', 'invoiced', 'paid'].includes(i.status)).length,
+        valueLo: catItems.reduce((s, i) => s + (i.quoted_value_lo ?? 0), 0),
+        valueHi: catItems.reduce((s, i) => s + (i.quoted_value_hi ?? 0), 0),
+      }
+    })
+    .filter(c => c.total > 0)
 
   const recentlyDone = items
     .filter(i => i.status === 'complete' && i.completed_date)
     .sort((a, b) => (b.completed_date ?? '').localeCompare(a.completed_date ?? ''))
     .slice(0, 5)
 
-  const blocked = items.filter(i => i.blockers && i.status === 'pending')
+  const blocked = items.filter(i => i.blockers && i.status !== 'complete' && i.status !== 'invoiced' && i.status !== 'paid')
 
   return (
     <div style={{ maxWidth: 1100 }}>
@@ -67,7 +86,7 @@ export function DashboardPage() {
       {/* Progress bar */}
       <div style={{ background: '#fff', borderRadius: 10, border: '1px solid #dce2ef', padding: '18px 22px', marginBottom: 20 }}>
         <div className="flex items-center justify-between mb-2">
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#1a2744' }}>Overall Completion</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#1a2744' }}>Overall Completion (Billable)</span>
           <span style={{ fontSize: 13, fontWeight: 700, color: '#3472c8' }}>{pct}%</span>
         </div>
         <div style={{ height: 10, background: '#e8f0fc', borderRadius: 5, overflow: 'hidden' }}>
@@ -83,7 +102,7 @@ export function DashboardPage() {
       {/* Status strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 10, marginBottom: 20 }}>
         {(['pending', 'open', 'in_progress', 'uat', 'complete', 'invoiced', 'paid'] as Status[]).map(s => (
-          <div key={s} style={{ background: '#fff', borderRadius: 8, border: `1px solid #dce2ef`, borderTop: `3px solid ${STATUS_COLORS[s]}`, padding: '12px 10px', textAlign: 'center' }}>
+          <div key={s} style={{ background: '#fff', borderRadius: 8, border: '1px solid #dce2ef', borderTop: `3px solid ${STATUS_COLORS[s]}`, padding: '12px 10px', textAlign: 'center' }}>
             <div style={{ fontSize: 24, fontWeight: 800, color: STATUS_COLORS[s], lineHeight: 1 }}>
               {byStatus[s]?.length ?? 0}
             </div>
@@ -101,21 +120,21 @@ export function DashboardPage() {
             By Category
           </div>
           {byCategory.map(c => (
-            <div key={c.cat} style={{ marginBottom: 12 }}>
+            <div key={c.cat} style={{ marginBottom: 10 }}>
               <div className="flex justify-between items-center mb-1">
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#1a2744' }}>{c.cat}</span>
-                <span style={{ fontSize: 12, color: '#7080a0' }}>
-                  {c.done}/{c.total} done &nbsp;|&nbsp;
+                <span style={{ fontSize: 12, fontWeight: 700, color: CAT_COLORS[c.cat] ?? '#1a2744' }}>{c.cat}</span>
+                <span style={{ fontSize: 11, color: '#7080a0' }}>
+                  {c.done}/{c.total}{' '}
                   <span style={{ color: '#2f6ec4', fontWeight: 600 }}>
                     ${c.valueLo.toLocaleString()} - ${c.valueHi.toLocaleString()}
                   </span>
                 </span>
               </div>
-              <div style={{ height: 6, background: '#e8f0fc', borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ height: 5, background: '#e8f0fc', borderRadius: 3, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%',
                   width: `${c.total > 0 ? Math.round((c.done / c.total) * 100) : 0}%`,
-                  background: '#3472c8',
+                  background: CAT_COLORS[c.cat] ?? '#3472c8',
                   borderRadius: 3,
                 }} />
               </div>

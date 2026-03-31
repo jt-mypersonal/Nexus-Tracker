@@ -30,10 +30,28 @@ body {
 .pill-paid        { background: #e4f5ee; color: #0a5030; font-weight: 700; }
 
 /* Category tag colors */
-.cat-1 { background: #fdecea; color: #900020; }
-.cat-2 { background: #e8f0fc; color: #1a4090; }
-.cat-3 { background: #f0e8fc; color: #6020a0; }
-.cat-4 { background: #f0f2f7; color: #3a4a6a; }
+.cat-1  { background: #fdecea; color: #900020; }
+.cat-2  { background: #e8f0fc; color: #1a4090; }
+.cat-3  { background: #f0e8fc; color: #6020a0; }
+.cat-3a { background: #ede0ff; color: #4a08a0; }
+.cat-3b { background: #f0e8fc; color: #6020a0; }
+.cat-3c { background: #e4e8fc; color: #2830b8; }
+.cat-3d { background: #fce8f4; color: #a01060; }
+.cat-3e { background: #fce8e0; color: #a03010; }
+.cat-4  { background: #f0f2f7; color: #3a4a6a; }
+
+/* NQ status */
+.nq-delivered    { background: #e4f5ee; color: #186040; }
+.nq-in_progress  { background: #e0f4ff; color: #0a5880; font-style: italic; }
+.nq-suggested    { background: #fff8e4; color: #8a5a00; }
+.nq-escalated    { background: #fdecea; color: #900020; }
+
+/* Change request status */
+.cr-pending         { background: #fff8e4; color: #8a5a00; }
+.cr-reviewed        { background: #e8f0fc; color: #1a4090; }
+.cr-approved        { background: #e4f5ee; color: #186040; }
+.cr-rejected        { background: #fdecea; color: #900020; }
+.cr-added_to_scope  { background: #f0e8fc; color: #6020a0; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }

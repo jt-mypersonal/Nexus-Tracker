@@ -21,13 +21,15 @@ export const STATUS_ORDER: Status[] = [
   'pending', 'open', 'in_progress', 'uat', 'complete', 'invoiced', 'paid',
 ]
 
-export type Category = 'Cat 1' | 'Cat 2' | 'Cat 3' | 'Cat 4'
-
 export const CATEGORY_LABELS: Record<string, string> = {
-  'Cat 1': 'Cat 1 - Fix Existing Issues',
-  'Cat 2': 'Cat 2 - Feature Backlog',
-  'Cat 3': 'Cat 3 - Phase II Core',
-  'Cat 4': 'Cat 4 - Ongoing Support',
+  'Cat 1':  'Cat 1 - Fix Existing Issues',
+  'Cat 2':  'Cat 2 - Feature Backlog',
+  'Cat 3A': 'Cat 3A - ArcGIS Departure and Platform Rebuild',
+  'Cat 3B': 'Cat 3B - Platform Foundation and Maps',
+  'Cat 3C': 'Cat 3C - Data and Financial Integrations',
+  'Cat 3D': 'Cat 3D - Automation, Notifications, and Compliance',
+  'Cat 3E': 'Cat 3E - Advanced Analytics and Reporting',
+  'Cat 4':  'Cat 4 - Ongoing Support',
 }
 
 export interface WorkItem {
@@ -76,6 +78,44 @@ export interface ItemNote {
   content: string
   author_email: string | null
   created_at: string
+}
+
+export interface TimeEntry {
+  id: string
+  work_item_id: string
+  started_at: string
+  stopped_at: string | null
+  duration_minutes: number | null
+  notes: string | null
+  logged_by: string | null
+  created_at: string
+}
+
+export interface ChangeRequest {
+  id: string
+  work_item_id: string | null
+  title: string
+  description: string
+  requested_by: string
+  status: 'pending' | 'reviewed' | 'approved' | 'rejected' | 'added_to_scope'
+  submitted_at: string
+  reviewed_at: string | null
+  reviewed_by: string | null
+  review_notes: string | null
+}
+
+export interface NqItem {
+  id: string
+  sort_order: number
+  title: string
+  description: string
+  category: string
+  status: 'delivered' | 'in_progress' | 'suggested' | 'escalated'
+  delivered_date: string | null
+  est_hrs_lo: number | null
+  est_hrs_hi: number | null
+  est_value_lo: number | null
+  est_value_hi: number | null
 }
 
 export interface Invoice {
