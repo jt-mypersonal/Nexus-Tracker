@@ -250,7 +250,7 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
 
         {/* Tabs */}
         <div style={{ borderBottom: '1px solid #dce2ef', display: 'flex', gap: 0 }}>
-          {(['detail', 'uat', 'notes', ...(isOwner ? ['time'] : [])] as const).map(t => {
+          {(['detail', 'uat', 'notes', ...(isOwner ? ['time'] : [])] as Array<'detail' | 'uat' | 'notes' | 'time'>).map(t => {
             let label = ''
             if (t === 'uat') label = `UAT (${uat.filter(u => u.is_complete).length}/${uat.length})`
             else if (t === 'notes') label = `Notes (${notes.length})`
