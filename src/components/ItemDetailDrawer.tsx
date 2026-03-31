@@ -221,6 +221,8 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
     .filter(e => e.stopped_at !== null)
     .reduce((s, e) => s + (e.duration_minutes ?? 0), 0)
 
+  const isOwner = user?.email === 'josh@finalmileos.com'
+
   const fmt = (v: number | null) => v != null ? `$${v.toLocaleString()}` : '--'
   const nextStatuses = STATUS_ORDER.filter(s => s !== item.status)
 
@@ -248,7 +250,7 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
 
         {/* Tabs */}
         <div style={{ borderBottom: '1px solid #dce2ef', display: 'flex', gap: 0 }}>
-          {(['detail', 'uat', 'notes', 'time'] as const).map(t => {
+          {(['detail', 'uat', 'notes', ...(isOwner ? ['time'] : [])] as const).map(t => {
             let label = ''
             if (t === 'uat') label = `UAT (${uat.filter(u => u.is_complete).length}/${uat.length})`
             else if (t === 'notes') label = `Notes (${notes.length})`
