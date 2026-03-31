@@ -26,6 +26,9 @@ export function WorkItemsPage() {
   const [sortCol, setSortCol] = useState<'id' | 'status' | 'category' | 'quoted_value_hi'>('id')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
+  // UAT completion summary: set of work_item_ids where all UAT items are checked
+  const [uatReady, setUatReady] = useState<Set<string>>(new Set())
+
   // NQ items state
   const [nqItems, setNqItems] = useState<NqItem[]>([])
   const [nqLoaded, setNqLoaded] = useState(false)
@@ -40,7 +43,22 @@ export function WorkItemsPage() {
       if (data) setItems(data as WorkItem[])
       setLoading(false)
     })
+    loadUatSummary()
   }, [])
+
+  async function loadUatSummary() {
+    const { data } = await supabase.from('uat_items').select('work_item_id, is_complete')
+    if (!data || data.length === 0) return
+    const totals: Record<string, { total: number; done: number }> = {}
+    for (const row of data) {
+      const id = row.work_item_id as string
+      if (!totals[id]) totals[id] = { total: 0, done: 0 }
+      totals[id].total++
+      if (row.is_complete) totals[id].done++
+    }
+    const ready = new Set(Object.entries(totals).filter(([, v]) => v.total > 0 && v.total === v.done).map(([k]) => k))
+    setUatReady(ready)
+  }
 
   useEffect(() => {
     if (mainTab === 'nq' && !nqLoaded) {
@@ -237,6 +255,7 @@ export function WorkItemsPage() {
                 )}
                 {filtered.map((item, idx) => {
                   const isGroupStart = idx === 0 || filtered[idx - 1].group_label !== item.group_label
+                  const allUatDone = uatReady.has(item.id)
                   return [
                     isGroupStart && (
                       <tr key={`g-${item.id}`} style={{ background: '#edf1f8' }}>
@@ -248,8 +267,12 @@ export function WorkItemsPage() {
                     <tr
                       key={item.id}
                       onClick={() => setSelected(item)}
-                      style={{ cursor: 'pointer', background: idx % 2 === 0 ? '#fff' : '#f8f9fc' }}
-                      className="hover:bg-blue-50"
+                      style={{
+                        cursor: 'pointer',
+                        background: allUatDone ? '#edfbf3' : idx % 2 === 0 ? '#fff' : '#f8f9fc',
+                        borderLeft: allUatDone ? '3px solid #1f9e64' : undefined,
+                      }}
+                      className={allUatDone ? 'hover:bg-green-50' : 'hover:bg-blue-50'}
                     >
                       <td style={{ padding: '9px 13px', fontSize: 11, fontWeight: 700, color: '#9aa5be', border: '1px solid #dce2ef' }}>
                         {item.id}
@@ -429,7 +452,7 @@ export function WorkItemsPage() {
       {selected && (
         <ItemDetailDrawer
           item={selected}
-          onClose={() => setSelected(null)}
+          onClose={() => { setSelected(null); loadUatSummary() }}
           onUpdated={handleUpdated}
         />
       )}
