@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #1a2744;
+  --navy-light: #233a6a;
+  --accent: #3472c8;
+  --accent-light: #6f9dd8;
+  --bg: #f5f6fa;
+  --border: #dce2ef;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: #1c2333;
+  line-height: 1.6;
+}
+
+/* Status pill colors */
+.pill-pending     { background: #fff8e4; color: #8a5a00; }
+.pill-open        { background: #e8f0fc; color: #1a4090; }
+.pill-in_progress { background: #e0f4ff; color: #0a5880; font-style: italic; }
+.pill-uat         { background: #f0e8fc; color: #6020a0; }
+.pill-complete    { background: #e4f5ee; color: #186040; }
+.pill-invoiced    { background: #fff0dc; color: #8a4000; }
+.pill-paid        { background: #e4f5ee; color: #0a5030; font-weight: 700; }
+
+/* Category tag colors */
+.cat-1 { background: #fdecea; color: #900020; }
+.cat-2 { background: #e8f0fc; color: #1a4090; }
+.cat-3 { background: #f0e8fc; color: #6020a0; }
+.cat-4 { background: #f0f2f7; color: #3a4a6a; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c0c8d8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #8090b0; }
+
+/* Drawer backdrop */
+.drawer-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(10, 15, 30, 0.45);
+  z-index: 40;
+  animation: fadeIn 0.15s ease;
+}
+
+.drawer-panel {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(680px, 96vw);
+  background: #fff;
+  z-index: 41;
+  overflow-y: auto;
+  animation: slideIn 0.2s ease;
+  box-shadow: -4px 0 40px rgba(0,0,0,0.18);
+}
+
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
