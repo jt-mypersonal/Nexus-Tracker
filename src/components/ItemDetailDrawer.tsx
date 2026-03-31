@@ -32,7 +32,7 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
       .select('*')
       .eq('work_item_id', item.id)
       .order('sort_order')
-    if (data) setUat(data as UatItem[])
+    if (data && data.length > 0) setUat(data as UatItem[])
     else await seedUat()
   }
 
