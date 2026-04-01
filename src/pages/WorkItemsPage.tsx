@@ -5,6 +5,7 @@ import { STATUS_LABELS, STATUS_ORDER } from '../lib/types'
 import { StatusBadge, CatBadge, NqStatusBadge, CrStatusBadge } from '../components/StatusBadge'
 import { ItemDetailDrawer } from '../components/ItemDetailDrawer'
 import { ChangeRequestModal } from '../components/ChangeRequestModal'
+import { useAuth } from '../context/AuthContext'
 
 const CATEGORIES = ['All', 'Cat 1', 'Cat 2', 'Cat 3', 'Cat 4A', 'Cat 4B', 'Cat 4C', 'Cat 4D', 'Cat 5']
 const STATUSES: Array<'All' | Status> = ['All', ...STATUS_ORDER]
@@ -37,6 +38,9 @@ export function WorkItemsPage() {
   const [changeRequests, setChangeRequests] = useState<ChangeRequest[]>([])
   const [crLoaded, setCrLoaded] = useState(false)
   const [crRefresh, setCrRefresh] = useState(0)
+
+  const { user } = useAuth()
+  const isOwner = user?.email === 'josh@finalmileos.com'
 
   useEffect(() => {
     supabase.from('work_items').select('*').order('sort_order').then(({ data }) => {
@@ -109,6 +113,23 @@ export function WorkItemsPage() {
       return 0
     })
 
+  type AggEntry = { hrsLo: number; hrsHi: number; valLo: number; valHi: number; actualHrs: number; hasActual: boolean }
+  const groupAggregates: Record<string, AggEntry> = {}
+  if (isOwner) {
+    for (const item of filtered) {
+      const g = item.group_label ?? ''
+      if (!groupAggregates[g]) groupAggregates[g] = { hrsLo: 0, hrsHi: 0, valLo: 0, valHi: 0, actualHrs: 0, hasActual: false }
+      groupAggregates[g].hrsLo += item.quoted_hrs_lo ?? 0
+      groupAggregates[g].hrsHi += item.quoted_hrs_hi ?? 0
+      groupAggregates[g].valLo += item.quoted_value_lo ?? 0
+      groupAggregates[g].valHi += item.quoted_value_hi ?? 0
+      if (item.actual_hrs != null) {
+        groupAggregates[g].actualHrs += item.actual_hrs
+        groupAggregates[g].hasActual = true
+      }
+    }
+  }
+
   const totalQuoted = filtered.reduce((s, i) => s + ((i.quoted_value_lo ?? 0) + (i.quoted_value_hi ?? 0)) / 2, 0)
 
   function handleUpdated(updated: WorkItem) {
@@ -120,6 +141,16 @@ export function WorkItemsPage() {
     if (lo == null) return '--'
     if (lo === hi) return `$${lo.toLocaleString()}`
     return `$${lo.toLocaleString()} - $${hi?.toLocaleString()}`
+  }
+
+  const fmtAggHrs = (lo: number, hi: number) => {
+    const f = (n: number) => n % 1 === 0 ? String(n) : n.toFixed(1)
+    return lo === hi ? `${f(lo)} hrs` : `${f(lo)} - ${f(hi)} hrs`
+  }
+
+  const fmtAggVal = (lo: number, hi: number) => {
+    const f = (n: number) => `$${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+    return lo === hi ? f(lo) : `${f(lo)} - ${f(hi)}`
   }
 
   function ThSort({ col, label }: { col: typeof sortCol; label: string }) {
@@ -224,7 +255,7 @@ export function WorkItemsPage() {
                 <col style={{ width: 110 }} />
                 <col style={{ width: 145 }} />
                 <col style={{ width: 110 }} />
-                <col style={{ width: 80 }} />
+                {isOwner && <col style={{ width: 80 }} />}
                 <col style={{ width: 70 }} />
               </colgroup>
               <thead>
@@ -239,9 +270,11 @@ export function WorkItemsPage() {
                   </th>
                   <ThSort col="quoted_value_hi" label="Quoted Value" />
                   <ThSort col="status" label="Status" />
-                  <th style={{ padding: '9px 13px', fontSize: 11, fontWeight: 600, color: '#adc4e0', letterSpacing: '0.06em', textTransform: 'uppercase', textAlign: 'center', border: '1px solid #2a3a60' }}>
-                    Actual Hrs
-                  </th>
+                  {isOwner && (
+                    <th style={{ padding: '9px 13px', fontSize: 11, fontWeight: 600, color: '#adc4e0', letterSpacing: '0.06em', textTransform: 'uppercase', textAlign: 'center', border: '1px solid #2a3a60' }}>
+                      Actual Hrs
+                    </th>
+                  )}
                   <th style={{ padding: '9px 13px', fontSize: 11, fontWeight: 600, color: '#adc4e0', letterSpacing: '0.06em', textTransform: 'uppercase', textAlign: 'center', border: '1px solid #2a3a60' }}>
                     CR
                   </th>
@@ -250,16 +283,18 @@ export function WorkItemsPage() {
               <tbody>
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={8} style={{ padding: 32, textAlign: 'center', color: '#9aa5be' }}>No items match your filters.</td>
+                    <td colSpan={isOwner ? 8 : 7} style={{ padding: 32, textAlign: 'center', color: '#9aa5be' }}>No items match your filters.</td>
                   </tr>
                 )}
                 {filtered.map((item, idx) => {
                   const isGroupStart = idx === 0 || filtered[idx - 1].group_label !== item.group_label
+                  const isGroupEnd = idx === filtered.length - 1 || filtered[idx + 1].group_label !== item.group_label
                   const allUatDone = uatReady.has(item.id)
+                  const agg = groupAggregates[item.group_label ?? '']
                   return [
                     isGroupStart && (
                       <tr key={`g-${item.id}`} style={{ background: '#edf1f8' }}>
-                        <td colSpan={8} style={{ padding: '6px 13px', fontSize: 11, fontWeight: 700, color: '#4a5580', letterSpacing: '0.05em', border: '1px solid #dce2ef' }}>
+                        <td colSpan={isOwner ? 8 : 7} style={{ padding: '6px 13px', fontSize: 11, fontWeight: 700, color: '#4a5580', letterSpacing: '0.05em', border: '1px solid #dce2ef' }}>
                           {item.group_label}
                         </td>
                       </tr>
@@ -297,9 +332,11 @@ export function WorkItemsPage() {
                       <td style={{ padding: '9px 13px', border: '1px solid #dce2ef' }}>
                         <StatusBadge status={item.status} />
                       </td>
-                      <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', textAlign: 'center', fontWeight: 600, color: '#1f6040' }}>
-                        {item.actual_hrs ?? '--'}
-                      </td>
+                      {isOwner && (
+                        <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', textAlign: 'center', fontWeight: 600, color: '#1f6040' }}>
+                          {item.actual_hrs ?? '--'}
+                        </td>
+                      )}
                       <td style={{ padding: '6px 8px', border: '1px solid #dce2ef', textAlign: 'center' }}>
                         <button
                           onClick={e => { e.stopPropagation(); setCrModalItem(item); setCrModalOpen(true) }}
@@ -311,6 +348,26 @@ export function WorkItemsPage() {
                         </button>
                       </td>
                     </tr>,
+                    isGroupEnd && isOwner && agg && (
+                      <tr key={`agg-${item.id}`} style={{ background: '#eef2fc' }}>
+                        <td colSpan={3} style={{ padding: '6px 13px', fontSize: 10, fontWeight: 700, color: '#5a6880', letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'right', border: '1px solid #dce2ef', borderTop: '2px solid #c0ccec' }}>
+                          Category Totals
+                        </td>
+                        <td style={{ padding: '6px 13px', fontSize: 12, fontWeight: 700, color: '#1a4090', textAlign: 'center', border: '1px solid #dce2ef', borderTop: '2px solid #c0ccec', whiteSpace: 'nowrap' }}>
+                          {fmtAggHrs(agg.hrsLo, agg.hrsHi)}
+                        </td>
+                        <td style={{ padding: '6px 13px', fontSize: 12, fontWeight: 700, color: '#1a4090', textAlign: 'center', border: '1px solid #dce2ef', borderTop: '2px solid #c0ccec', whiteSpace: 'nowrap' }}>
+                          {fmtAggVal(agg.valLo, agg.valHi)}
+                        </td>
+                        <td style={{ border: '1px solid #dce2ef', borderTop: '2px solid #c0ccec' }} />
+                        <td style={{ padding: '6px 13px', fontSize: 12, fontWeight: 700, color: '#1f6040', textAlign: 'center', border: '1px solid #dce2ef', borderTop: '2px solid #c0ccec', whiteSpace: 'nowrap' }}>
+                          {agg.hasActual ? `${agg.actualHrs.toFixed(1)} hrs` : '--'}
+                        </td>
+                        <td style={{ padding: '6px 13px', fontSize: 12, fontWeight: 700, color: '#1f6040', textAlign: 'center', border: '1px solid #dce2ef', borderTop: '2px solid #c0ccec', whiteSpace: 'nowrap' }}>
+                          {agg.hasActual ? `$${(agg.actualHrs * 125).toLocaleString('en-US', { maximumFractionDigits: 0 })} billed` : '--'}
+                        </td>
+                      </tr>
+                    ),
                   ]
                 })}
               </tbody>
