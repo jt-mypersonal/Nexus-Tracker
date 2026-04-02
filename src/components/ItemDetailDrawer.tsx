@@ -379,15 +379,13 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
                 <div style={{ fontSize: 12, color: '#7080a0' }}>
                   Check off each item as you verify it during client review.
                 </div>
-                {isOwner && (
-                  <button
-                    onClick={regenerateUat}
-                    style={{ fontSize: 11, color: '#7080a0', background: 'none', border: '1px solid #dce2ef', borderRadius: 5, padding: '3px 10px', cursor: 'pointer' }}
-                    title="Delete and regenerate UAT checklist from item title/notes"
-                  >
-                    Regenerate
-                  </button>
-                )}
+                <button
+                  onClick={regenerateUat}
+                  style={{ fontSize: 11, color: '#7080a0', background: 'none', border: '1px solid #dce2ef', borderRadius: 5, padding: '3px 10px', cursor: 'pointer' }}
+                  title="Delete and regenerate UAT checklist from item title/notes"
+                >
+                  Regenerate
+                </button>
               </div>
               {uat.length === 0 && <div style={{ color: '#9aa5be', fontSize: 13 }}>Loading checklist...</div>}
               <div className="flex flex-col gap-2">

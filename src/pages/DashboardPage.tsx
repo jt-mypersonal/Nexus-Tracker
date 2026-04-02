@@ -69,7 +69,6 @@ export function DashboardPage() {
   const recentlyDone = items
     .filter(i => i.status === 'complete' && i.completed_date)
     .sort((a, b) => (b.completed_date ?? '').localeCompare(a.completed_date ?? ''))
-    .slice(0, 5)
 
   const blocked = items.filter(i => i.blockers && i.status !== 'complete' && i.status !== 'invoiced' && i.status !== 'paid')
 
@@ -148,8 +147,8 @@ export function DashboardPage() {
             Active Blockers ({blocked.length})
           </div>
           {blocked.length === 0 && <div style={{ fontSize: 13, color: '#9aa5be' }}>No active blockers.</div>}
-          <div className="flex flex-col gap-2">
-            {blocked.slice(0, 6).map(i => (
+          <div className="flex flex-col gap-2" style={{ maxHeight: 240, overflowY: 'auto' }}>
+            {blocked.map(i => (
               <div key={i.id} style={{ fontSize: 12, borderLeft: '3px solid #e06020', paddingLeft: 10, color: '#2c3a58' }}>
                 <strong>{i.id}</strong> {i.title}
                 <div style={{ color: '#9aa5be', fontSize: 11, marginTop: 2 }}>{i.blockers}</div>
@@ -165,7 +164,7 @@ export function DashboardPage() {
           Recently Completed
         </div>
         {recentlyDone.length === 0 && <div style={{ fontSize: 13, color: '#9aa5be' }}>Nothing completed yet.</div>}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2" style={{ maxHeight: 240, overflowY: 'auto' }}>
           {recentlyDone.map(i => (
             <div key={i.id} className="flex items-center gap-3" style={{ fontSize: 13 }}>
               <StatusBadge status={i.status} />
