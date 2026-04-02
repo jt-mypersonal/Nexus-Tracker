@@ -1,24 +1,20 @@
 export type Status =
   | 'pending'
-  | 'open'
-  | 'in_progress'
+  | 'ready'
+  | 'blocked'
   | 'uat'
   | 'complete'
-  | 'invoiced'
-  | 'paid'
 
 export const STATUS_LABELS: Record<Status, string> = {
-  pending:     'Pending',
-  open:        'Ready',
-  in_progress: 'In Progress',
-  uat:         'UAT',
-  complete:    'Complete',
-  invoiced:    'Invoiced',
-  paid:        'Paid',
+  pending:  'Pending',
+  ready:    'Ready',
+  blocked:  'Blocked',
+  uat:      'UAT',
+  complete: 'Complete',
 }
 
 export const STATUS_ORDER: Status[] = [
-  'pending', 'open', 'in_progress', 'uat', 'complete', 'invoiced', 'paid',
+  'pending', 'ready', 'blocked', 'uat', 'complete',
 ]
 
 export const CATEGORY_LABELS: Record<string, string> = {

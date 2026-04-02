@@ -21,13 +21,11 @@ body {
 }
 
 /* Status pill colors */
-.pill-pending     { background: #fff8e4; color: #8a5a00; }
-.pill-open        { background: #e8f0fc; color: #1a4090; }
-.pill-in_progress { background: #e0f4ff; color: #0a5880; font-style: italic; }
-.pill-uat         { background: #f0e8fc; color: #6020a0; }
-.pill-complete    { background: #e4f5ee; color: #186040; }
-.pill-invoiced    { background: #fff0dc; color: #8a4000; }
-.pill-paid        { background: #e4f5ee; color: #0a5030; font-weight: 700; }
+.pill-pending  { background: #fff8e4; color: #8a5a00; }
+.pill-ready    { background: #e8f0fc; color: #1a4090; }
+.pill-blocked  { background: #fdecea; color: #900020; }
+.pill-uat      { background: #f0e8fc; color: #6020a0; }
+.pill-complete { background: #e4f5ee; color: #186040; }
 
 /* Category tag colors */
 .cat-1  { background: #fdecea; color: #900020; }

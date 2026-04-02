@@ -16,7 +16,7 @@ create table if not exists work_items (
   quoted_value_lo numeric(10,2),
   quoted_value_hi numeric(10,2),
   status          text not null default 'pending'
-                  check (status in ('pending','open','in_progress','uat','complete','invoiced','paid')),
+                  check (status in ('pending','ready','blocked','uat','complete')),
   actual_hrs      numeric(6,1),
   completed_date  date,
   notes           text,
