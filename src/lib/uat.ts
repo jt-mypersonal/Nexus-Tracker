@@ -50,7 +50,7 @@ export function generateUatItems(title: string, notes: string | null): string[] 
       'Confirm a prompt appears asking you to confirm before anything is deleted',
     ]
 
-  if (t.includes('sort') || t.includes('grid') || t.includes('table'))
+  if (t.includes('sort') || t.includes('sortable') || t.includes('column header'))
     return [
       'Click a column header to sort the list — confirm it reorders correctly',
       'Click the same header again — confirm it sorts in the opposite direction',
