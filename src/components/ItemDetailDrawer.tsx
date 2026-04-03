@@ -331,7 +331,7 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
               )}
 
               {/* Blockers */}
-              {item.blockers && (
+              {item.blockers && item.status !== 'uat' && (
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: '#a04000', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                     Blockers

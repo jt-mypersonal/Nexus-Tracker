@@ -314,7 +314,7 @@ export function WorkItemsPage() {
                       </td>
                       <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', color: '#1c2333' }}>
                         <div style={{ fontWeight: 600 }}>{item.title}</div>
-                        {item.blockers && (
+                        {item.blockers && item.status !== 'uat' && (
                           <div style={{ fontSize: 11, color: '#c06020', marginTop: 2 }}>
                             Blocked: {item.blockers.slice(0, 80)}{item.blockers.length > 80 ? '...' : ''}
                           </div>
