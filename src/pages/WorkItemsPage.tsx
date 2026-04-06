@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { WorkItem, NqItem, ChangeRequest, Status } from '../lib/types'
 import { STATUS_LABELS, STATUS_ORDER } from '../lib/types'
@@ -29,6 +29,8 @@ export function WorkItemsPage() {
 
   // UAT completion summary: set of work_item_ids where all UAT items are checked
   const [uatReady, setUatReady] = useState<Set<string>>(new Set())
+  const [uatLoaded, setUatLoaded] = useState(false)
+  const defaultCatApplied = useRef(false)
 
   // NQ items state
   const [nqItems, setNqItems] = useState<NqItem[]>([])
@@ -62,6 +64,7 @@ export function WorkItemsPage() {
     }
     const ready = new Set(Object.entries(totals).filter(([, v]) => v.total > 0 && v.total === v.done).map(([k]) => k))
     setUatReady(ready)
+    setUatLoaded(true)
   }
 
   useEffect(() => {
@@ -79,6 +82,17 @@ export function WorkItemsPage() {
   useEffect(() => {
     if (crRefresh > 0) loadChangeRequests()
   }, [crRefresh])
+
+  // Default to the first category with open UAT tasks
+  useEffect(() => {
+    if (loading || !uatLoaded || defaultCatApplied.current) return
+    defaultCatApplied.current = true
+    const cats = ['Cat 1', 'Cat 2', 'Cat 3', 'Cat 4A', 'Cat 4B', 'Cat 4C', 'Cat 4D', 'Cat 5']
+    const first = cats.find(cat =>
+      items.some(i => i.category === cat && i.status === 'uat' && !uatReady.has(i.id))
+    )
+    if (first) setCatFilter(first)
+  }, [loading, uatLoaded, items, uatReady])
 
   async function loadChangeRequests() {
     const { data } = await supabase
