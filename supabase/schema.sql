@@ -71,6 +71,22 @@ create table if not exists invoices (
   created_at     timestamptz not null default now()
 );
 
+-- Form review sessions (mobile UAT)
+create table if not exists form_reviews (
+  id             uuid primary key default gen_random_uuid(),
+  form_type      text not null,
+  form_label     text not null,
+  reviewer_email text not null,
+  reviewer_name  text not null default '',
+  results        jsonb not null default '{}',
+  notes_map      jsonb not null default '{}',
+  pass_count     integer not null default 0,
+  fail_count     integer not null default 0,
+  total_count    integer not null default 0,
+  created_at     timestamptz not null default now(),
+  updated_at     timestamptz not null default now()
+);
+
 -- RLS: enable row level security
 alter table work_items    enable row level security;
 alter table status_history enable row level security;
@@ -93,4 +109,8 @@ create policy "authenticated full access" on item_notes
   for all to authenticated using (true) with check (true);
 
 create policy "authenticated full access" on invoices
+  for all to authenticated using (true) with check (true);
+
+alter table form_reviews enable row level security;
+create policy "authenticated full access" on form_reviews
   for all to authenticated using (true) with check (true);

@@ -58,6 +58,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
           >
             Invoices
           </NavLink>
+          <NavLink
+            to="/form-review"
+            className={({ isActive }) =>
+              `px-4 py-1.5 rounded text-sm font-medium transition-colors ${
+                isActive ? 'text-white' : 'text-blue-200 hover:text-white hover:bg-white/10'
+              }`
+            }
+            style={({ isActive }) => isActive ? { background: '#3472c8' } : {}}
+          >
+            Form Review
+          </NavLink>
         </nav>
 
         <div className="ml-auto flex items-center gap-3">

@@ -5,6 +5,8 @@ import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { WorkItemsPage } from './pages/WorkItemsPage'
 import { InvoicesPage } from './pages/InvoicesPage'
+import { FormReviewPage } from './pages/FormReviewPage'
+import { FormReviewDetailPage } from './pages/FormReviewDetailPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { session, loading } = useAuth()
@@ -23,6 +25,8 @@ function AppRoutes() {
       <Route path="/" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
       <Route path="/items" element={<PrivateRoute><WorkItemsPage /></PrivateRoute>} />
       <Route path="/invoices" element={<PrivateRoute><InvoicesPage /></PrivateRoute>} />
+      <Route path="/form-review" element={<PrivateRoute><FormReviewPage /></PrivateRoute>} />
+      <Route path="/form-review/:formId" element={<PrivateRoute><FormReviewDetailPage /></PrivateRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
