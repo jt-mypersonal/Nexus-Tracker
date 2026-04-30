@@ -30,6 +30,7 @@ export function FormReviewPage() {
   const [reviews, setReviews] = useState<SavedReview[]>([])
   const [loading, setLoading] = useState(true)
   const [starting, setStarting] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
   useEffect(() => {
     supabase
@@ -54,6 +55,16 @@ export function FormReviewPage() {
   function startReview(formId: string) {
     setStarting(formId)
     navigate(`/form-review/${formId}`)
+  }
+
+  async function handleDelete(e: React.MouseEvent, reviewId: string) {
+    e.stopPropagation()
+    if (!window.confirm('Delete this review? This cannot be undone.')) return
+    setDeleting(reviewId)
+    const { error } = await supabase.from('form_reviews').delete().eq('id', reviewId)
+    setDeleting(null)
+    if (error) { alert('Delete failed: ' + error.message); return }
+    setReviews(prev => prev.filter(r => r.id !== reviewId))
   }
 
   return (
@@ -126,6 +137,7 @@ export function FormReviewPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {prior.slice(0, 5).map(r => {
                         const rate = passRate(r)
+                        const isOwn = r.reviewer_email === user?.email
                         return (
                           <div
                             key={r.id}
@@ -154,6 +166,20 @@ export function FormReviewPage() {
                               </div>
                             )}
                             <div style={{ color: '#3472c8', fontSize: 11 }}>View →</div>
+                            {isOwn && (
+                              <button
+                                onClick={e => handleDelete(e, r.id)}
+                                disabled={deleting === r.id}
+                                title="Delete this review"
+                                style={{
+                                  background: 'none', border: 'none', cursor: deleting === r.id ? 'default' : 'pointer',
+                                  color: deleting === r.id ? '#374151' : '#6b7280', fontSize: 14, padding: '0 2px',
+                                  lineHeight: 1, opacity: deleting === r.id ? 0.5 : 1,
+                                }}
+                              >
+                                ✕
+                              </button>
+                            )}
                           </div>
                         )
                       })}

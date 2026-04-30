@@ -261,7 +261,7 @@ export function FormReviewDetailPage() {
             </div>
           )}
           {step.stepNote && (
-            <div style={{ background: '#1c1f2e', borderLeft: '3px solid #334155', color: '#7080a0', fontSize: 12, padding: '6px 10px', borderRadius: '0 4px 4px 0', marginBottom: 6 }}>
+            <div style={{ background: '#1c1f2e', borderLeft: '3px solid #334155', color: '#94a3b8', fontSize: 12, padding: '6px 10px', borderRadius: '0 4px 4px 0', marginBottom: 6 }}>
               {step.stepNote}
             </div>
           )}
@@ -274,11 +274,11 @@ export function FormReviewDetailPage() {
               gridTemplateColumns: '2fr 120px 90px 200px 110px 1fr',
               gap: 0,
               background: '#0d1117',
-              borderBottom: '1px solid #1e293b',
-              padding: '6px 12px',
+              borderBottom: '1px solid #253358',
+              padding: '7px 12px',
             }}>
               {['Field', 'Type', 'Required', 'Synced From Portal', 'Result', 'Notes'].map(h => (
-                <div key={h} style={{ color: '#4a5568', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</div>
+                <div key={h} style={{ color: '#7b92b2', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</div>
               ))}
             </div>
 
@@ -287,10 +287,11 @@ export function FormReviewDetailPage() {
               const res = results[k]?.r ?? ''
               const nt  = notes[k] ?? ''
               const isOpen = openNote === k
-              const rowBg = res === 'pass' ? '#0a1a0f' : res === 'fail' ? '#1a0a0a' : res === 'na' ? '#0a0e1a' : 'transparent'
+              const baseRow = fi % 2 === 0 ? '#111827' : '#0d1117'
+              const rowBg = res === 'pass' ? '#071a0d' : res === 'fail' ? '#1a0808' : res === 'na' ? '#080e1a' : baseRow
 
               return (
-                <div key={fi} style={{ borderBottom: '1px solid #1a2030', background: rowBg }}>
+                <div key={fi} style={{ borderBottom: '1px solid #1e2a3a', background: rowBg }}>
                   <div style={{
                     display: 'grid',
                     gridTemplateColumns: '2fr 120px 90px 200px 110px 1fr',
@@ -300,9 +301,9 @@ export function FormReviewDetailPage() {
                   }}>
                     {/* Field label */}
                     <div>
-                      <div style={{ color: '#e2e8f0', fontSize: 13, fontWeight: 500 }}>{field.label}</div>
+                      <div style={{ color: '#f1f5f9', fontSize: 13, fontWeight: 600 }}>{field.label}</div>
                       {field.note && (
-                        <div style={{ color: '#475569', fontSize: 11, marginTop: 2 }}>{field.note}</div>
+                        <div style={{ color: '#64748b', fontSize: 11, marginTop: 3, lineHeight: 1.4 }}>{field.note}</div>
                       )}
                     </div>
 
@@ -319,9 +320,9 @@ export function FormReviewDetailPage() {
                     {/* Sync source */}
                     <div style={{ paddingTop: 2 }}>
                       {field.sync ? (
-                        <span style={{ color: '#60a5fa', fontSize: 11 }}>{field.sync}</span>
+                        <span style={{ color: '#93c5fd', fontSize: 11, lineHeight: 1.4 }}>{field.sync}</span>
                       ) : (
-                        <span style={{ color: '#2d3a50', fontSize: 11 }}>—</span>
+                        <span style={{ color: '#374151', fontSize: 11 }}>—</span>
                       )}
                     </div>
 
@@ -330,10 +331,12 @@ export function FormReviewDetailPage() {
                       <ResultButtons value={res} onChange={v => setResult(k, v)} disabled={readOnly} />
                     </div>
 
-                    {/* Notes toggle */}
+                    {/* Notes — always visible textarea in edit mode */}
                     <div style={{ paddingTop: 2 }}>
                       {readOnly ? (
-                        nt ? <span style={{ color: '#7080a0', fontSize: 11 }}>{nt}</span> : null
+                        nt
+                          ? <span style={{ color: '#94a3b8', fontSize: 12, lineHeight: 1.5 }}>{nt}</span>
+                          : <span style={{ color: '#374151', fontSize: 11 }}>—</span>
                       ) : (
                         <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
                           {isOpen ? (
@@ -342,11 +345,11 @@ export function FormReviewDetailPage() {
                               value={nt}
                               onChange={e => setNote(k, e.target.value)}
                               onBlur={() => setOpenNote(null)}
-                              rows={2}
+                              rows={4}
                               style={{
-                                background: '#1e293b', border: '1px solid #334155', borderRadius: 6,
-                                color: '#cbd5e1', fontSize: 12, padding: '4px 8px',
-                                resize: 'vertical', width: '100%', minWidth: 120,
+                                background: '#1e293b', border: '1px solid #3b5275', borderRadius: 6,
+                                color: '#e2e8f0', fontSize: 12, padding: '6px 8px',
+                                resize: 'vertical', width: '100%', minWidth: 120, lineHeight: 1.5,
                               }}
                               placeholder="Add a note…"
                             />
@@ -355,8 +358,8 @@ export function FormReviewDetailPage() {
                               onClick={() => setOpenNote(k)}
                               style={{
                                 background: 'none', border: '1px solid #253358', borderRadius: 6,
-                                color: nt ? '#60a5fa' : '#2d3a50', fontSize: 11, cursor: 'pointer',
-                                padding: '2px 8px',
+                                color: nt ? '#93c5fd' : '#374151', fontSize: 11, cursor: 'pointer',
+                                padding: '3px 10px', lineHeight: 1.5,
                               }}
                             >
                               {nt ? '📝 ' + nt.slice(0, 30) + (nt.length > 30 ? '…' : '') : '+ Note'}
