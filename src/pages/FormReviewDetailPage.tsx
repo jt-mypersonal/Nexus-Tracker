@@ -35,7 +35,7 @@ function TypeBadge({ type }: { type: string }) {
 function ReqBadge({ req }: { req: RequiredLevel }) {
   if (req === 'YES')  return <span style={{ background: '#450a0a', color: '#fca5a5', fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 8 }}>Required</span>
   if (req === 'COND') return <span style={{ background: '#431407', color: '#fdba74', fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 8 }}>Conditional</span>
-  return <span style={{ background: '#1e293b', color: '#475569', fontSize: 10, padding: '1px 7px', borderRadius: 8 }}>Optional</span>
+  return <span style={{ background: '#1e293b', color: '#cbd5e1', fontSize: 10, padding: '1px 7px', borderRadius: 8 }}>Optional</span>
 }
 
 // ── Result buttons ────────────────────────────────────────────────────────────
@@ -58,7 +58,7 @@ function ResultButtons({
             fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 6, border: 'none',
             cursor: disabled ? 'default' : 'pointer',
             background: value === o.v ? o.active : '#1e293b',
-            color: value === o.v ? o.text : '#475569',
+            color: value === o.v ? o.text : '#d1d5db',
             opacity: disabled ? 0.7 : 1,
           }}
         >
@@ -358,7 +358,7 @@ export function FormReviewDetailPage() {
                               onClick={() => setOpenNote(k)}
                               style={{
                                 background: 'none', border: '1px solid #253358', borderRadius: 6,
-                                color: nt ? '#93c5fd' : '#374151', fontSize: 11, cursor: 'pointer',
+                                color: nt ? '#93c5fd' : '#94a3b8', fontSize: 11, cursor: 'pointer',
                                 padding: '3px 10px', lineHeight: 1.5,
                               }}
                             >
