@@ -122,7 +122,7 @@ INSERT INTO nq_items (id, sort_order, title, description, category, status, deli
  'Database / Infrastructure', 'delivered', '2026-04-10', 2.0, 3.0, 250.00, 375.00),
 
 ('NQ-22',  260, 'Server-Side Per-User Data Scoping',
- 'Implemented Option 2 PM cascade: all project, site, and form queries filtered server-side by the logged-in user's employee_id. Prevents data leakage between PMs.',
+ 'Implemented Option 2 PM cascade: all project, site, and form queries filtered server-side by the logged-in user''s employee_id. Prevents data leakage between PMs.',
  'Database / Infrastructure', 'delivered', '2026-04-10', 3.0, 4.0, 375.00, 500.00),
 
 ('NQ-23',  270, 'Survey123 Import Idempotency — globalid on 10 Sub-Tables',
