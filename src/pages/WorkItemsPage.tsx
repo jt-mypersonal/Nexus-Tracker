@@ -404,60 +404,33 @@ export function WorkItemsPage() {
             <div style={{ color: '#9aa5be', padding: 24 }}>No items found. Run supabase/seed_nq_items.sql in the Supabase SQL Editor first.</div>
           )}
           {nqLoaded && nqItems.length > 0 && (() => {
-            const totalHrsLo = nqItems.reduce((s, i) => s + (i.est_hrs_lo ?? 0), 0)
-            const totalHrsHi = nqItems.reduce((s, i) => s + (i.est_hrs_hi ?? 0), 0)
-            const totalValLo = nqItems.reduce((s, i) => s + (i.est_value_lo ?? 0), 0)
-            const totalValHi = nqItems.reduce((s, i) => s + (i.est_value_hi ?? 0), 0)
-            const fmtVal = (n: number) => `$${Math.round(n).toLocaleString('en-US')}`
-            const fmtHrs = (n: number) => n % 1 === 0 ? String(n) : n.toFixed(1)
-            // Group by category
             const categories = [...new Set(nqItems.map(i => i.category))]
             return (
               <>
-                {/* Summary cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: isOwner ? 'repeat(3, 1fr)' : '1fr', gap: 12, marginBottom: 20 }}>
-                  {[
-                    { label: 'Items Delivered', value: String(nqItems.length), sub: 'Completed outside scope', ownerOnly: false },
-                    { label: 'Estimated Hours', value: `${fmtHrs(totalHrsLo)} – ${fmtHrs(totalHrsHi)} hrs`, sub: 'At standard engagement rate', ownerOnly: true },
-                    { label: 'Estimated Value', value: `${fmtVal(totalValLo)} – ${fmtVal(totalValHi)}`, sub: `At $125/hr — delivered free`, ownerOnly: true },
-                  ].filter(c => !c.ownerOnly || isOwner).map(c => (
-                    <div key={c.label} style={{ background: '#fffbef', border: '1px solid #f0d880', borderRadius: 10, padding: '14px 18px' }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#8a6000', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{c.label}</div>
-                      <div style={{ fontSize: 22, fontWeight: 800, color: '#1a2744', lineHeight: 1.1 }}>{c.value}</div>
-                      <div style={{ fontSize: 11, color: '#9a8040', marginTop: 3 }}>{c.sub}</div>
-                    </div>
-                  ))}
+                <div style={{ fontSize: 13, color: '#7080a0', marginBottom: 16 }}>
+                  {nqItems.length} items delivered outside proposal scope
                 </div>
-
-                {/* Table grouped by category */}
                 {categories.map(cat => {
                   const rows = nqItems.filter(i => i.category === cat)
-                  const catHrsLo = rows.reduce((s, i) => s + (i.est_hrs_lo ?? 0), 0)
-                  const catHrsHi = rows.reduce((s, i) => s + (i.est_hrs_hi ?? 0), 0)
-                  const catValLo = rows.reduce((s, i) => s + (i.est_value_lo ?? 0), 0)
-                  const catValHi = rows.reduce((s, i) => s + (i.est_value_hi ?? 0), 0)
                   return (
                     <div key={cat} style={{ marginBottom: 20, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 8px rgba(0,0,0,0.07)', border: '1px solid #dce2ef' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                         <colgroup>
                           <col style={{ width: 72 }} />
                           <col />
-                          <col style={{ width: 110 }} />
-                          <col style={{ width: 130 }} />
                         </colgroup>
                         <thead>
                           <tr style={{ background: '#1a2744' }}>
-                            <th colSpan={isOwner ? 4 : 2} style={{ padding: '8px 14px', fontSize: 12, fontWeight: 700, color: '#e8eef8', textAlign: 'left', border: '1px solid #2a3a60', letterSpacing: '0.03em' }}>
+                            <th colSpan={2} style={{ padding: '8px 14px', fontSize: 12, fontWeight: 700, color: '#e8eef8', textAlign: 'left', border: '1px solid #2a3a60', letterSpacing: '0.03em' }}>
                               {cat}
                               <span style={{ marginLeft: 12, fontSize: 11, fontWeight: 500, color: '#7dc8f8' }}>
                                 {rows.length} item{rows.length !== 1 ? 's' : ''}
-                                {isOwner && <> &nbsp;·&nbsp; {fmtHrs(catHrsLo)}–{fmtHrs(catHrsHi)} hrs &nbsp;·&nbsp; {fmtVal(catValLo)}–{fmtVal(catValHi)}</>}
                               </span>
                             </th>
                           </tr>
                           <tr style={{ background: '#243060' }}>
-                            {['ID', 'Deliverable', ...(isOwner ? ['Est. Hours', 'Est. Value'] : [])].map(h => (
-                              <th key={h} style={{ padding: '7px 13px', fontSize: 10, fontWeight: 600, color: '#adc4e0', letterSpacing: '0.06em', textTransform: 'uppercase', textAlign: h === 'Est. Hours' || h === 'Est. Value' ? 'center' : 'left', border: '1px solid #2a3a60' }}>
+                            {['ID', 'Deliverable'].map(h => (
+                              <th key={h} style={{ padding: '7px 13px', fontSize: 10, fontWeight: 600, color: '#adc4e0', letterSpacing: '0.06em', textTransform: 'uppercase', textAlign: 'left', border: '1px solid #2a3a60' }}>
                                 {h}
                               </th>
                             ))}
@@ -466,7 +439,7 @@ export function WorkItemsPage() {
                         <tbody>
                           {rows.map((nq, idx) => (
                             <tr key={nq.id} style={{ background: idx % 2 === 0 ? '#fff' : '#f8f9fc' }}>
-                              <td style={{ padding: '9px 13px', fontSize: 11, fontWeight: 700, color: '#9aa5be', border: '1px solid #dce2ef', whiteSpace: 'nowrap' }}>
+                              <td style={{ padding: '9px 13px', fontSize: 11, fontWeight: 700, color: '#9aa5be', border: '1px solid #dce2ef', whiteSpace: 'nowrap', verticalAlign: 'top' }}>
                                 {nq.id}
                               </td>
                               <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', color: '#1c2333' }}>
@@ -475,16 +448,6 @@ export function WorkItemsPage() {
                                   <div style={{ fontSize: 11, color: '#7080a0', marginTop: 3, lineHeight: 1.5 }}>{nq.description}</div>
                                 )}
                               </td>
-                              {isOwner && (
-                                <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', textAlign: 'center', color: '#4a5580', whiteSpace: 'nowrap', fontSize: 12 }}>
-                                  {nq.est_hrs_lo != null ? (nq.est_hrs_lo === nq.est_hrs_hi ? `${fmtHrs(nq.est_hrs_lo)} hrs` : `${fmtHrs(nq.est_hrs_lo)}–${fmtHrs(nq.est_hrs_hi ?? 0)} hrs`) : '—'}
-                                </td>
-                              )}
-                              {isOwner && (
-                                <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', textAlign: 'center', fontWeight: 600, color: '#1a4090', whiteSpace: 'nowrap', fontSize: 12 }}>
-                                  {nq.est_value_lo != null ? (nq.est_value_lo === nq.est_value_hi ? fmtVal(nq.est_value_lo) : `${fmtVal(nq.est_value_lo)}–${fmtVal(nq.est_value_hi ?? 0)}`) : '—'}
-                                </td>
-                              )}
                             </tr>
                           ))}
                         </tbody>
@@ -492,23 +455,6 @@ export function WorkItemsPage() {
                     </div>
                   )
                 })}
-
-                {/* Grand total row */}
-                <div style={{ background: '#1a2744', borderRadius: 10, padding: '14px 20px', display: 'flex', justifyContent: 'flex-end', gap: 40, alignItems: 'center' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#adc4e0', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                    Total — {nqItems.length} Items Delivered
-                  </span>
-                  {isOwner && (
-                    <span style={{ fontSize: 14, fontWeight: 800, color: '#7dc8f8' }}>
-                      {fmtHrs(totalHrsLo)}–{fmtHrs(totalHrsHi)} hrs
-                    </span>
-                  )}
-                  {isOwner && (
-                    <span style={{ fontSize: 14, fontWeight: 800, color: '#4cde9f' }}>
-                      {fmtVal(totalValLo)} – {fmtVal(totalValHi)}
-                    </span>
-                  )}
-                </div>
               </>
             )
           })()}
