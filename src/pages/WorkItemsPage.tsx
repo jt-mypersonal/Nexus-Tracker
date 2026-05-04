@@ -415,12 +415,12 @@ export function WorkItemsPage() {
             return (
               <>
                 {/* Summary cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isOwner ? 'repeat(3, 1fr)' : '1fr', gap: 12, marginBottom: 20 }}>
                   {[
-                    { label: 'Items Delivered', value: String(nqItems.length), sub: 'Completed outside scope' },
-                    { label: 'Estimated Hours', value: `${fmtHrs(totalHrsLo)} – ${fmtHrs(totalHrsHi)} hrs`, sub: 'At standard engagement rate' },
-                    { label: 'Estimated Value', value: `${fmtVal(totalValLo)} – ${fmtVal(totalValHi)}`, sub: `At $125/hr — delivered free` },
-                  ].map(c => (
+                    { label: 'Items Delivered', value: String(nqItems.length), sub: 'Completed outside scope', ownerOnly: false },
+                    { label: 'Estimated Hours', value: `${fmtHrs(totalHrsLo)} – ${fmtHrs(totalHrsHi)} hrs`, sub: 'At standard engagement rate', ownerOnly: true },
+                    { label: 'Estimated Value', value: `${fmtVal(totalValLo)} – ${fmtVal(totalValHi)}`, sub: `At $125/hr — delivered free`, ownerOnly: true },
+                  ].filter(c => !c.ownerOnly || isOwner).map(c => (
                     <div key={c.label} style={{ background: '#fffbef', border: '1px solid #f0d880', borderRadius: 10, padding: '14px 18px' }}>
                       <div style={{ fontSize: 11, fontWeight: 700, color: '#8a6000', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{c.label}</div>
                       <div style={{ fontSize: 22, fontWeight: 800, color: '#1a2744', lineHeight: 1.1 }}>{c.value}</div>
@@ -447,15 +447,16 @@ export function WorkItemsPage() {
                         </colgroup>
                         <thead>
                           <tr style={{ background: '#1a2744' }}>
-                            <th colSpan={4} style={{ padding: '8px 14px', fontSize: 12, fontWeight: 700, color: '#e8eef8', textAlign: 'left', border: '1px solid #2a3a60', letterSpacing: '0.03em' }}>
+                            <th colSpan={isOwner ? 4 : 2} style={{ padding: '8px 14px', fontSize: 12, fontWeight: 700, color: '#e8eef8', textAlign: 'left', border: '1px solid #2a3a60', letterSpacing: '0.03em' }}>
                               {cat}
                               <span style={{ marginLeft: 12, fontSize: 11, fontWeight: 500, color: '#7dc8f8' }}>
-                                {rows.length} item{rows.length !== 1 ? 's' : ''} &nbsp;·&nbsp; {fmtHrs(catHrsLo)}–{fmtHrs(catHrsHi)} hrs &nbsp;·&nbsp; {fmtVal(catValLo)}–{fmtVal(catValHi)}
+                                {rows.length} item{rows.length !== 1 ? 's' : ''}
+                                {isOwner && <> &nbsp;·&nbsp; {fmtHrs(catHrsLo)}–{fmtHrs(catHrsHi)} hrs &nbsp;·&nbsp; {fmtVal(catValLo)}–{fmtVal(catValHi)}</>}
                               </span>
                             </th>
                           </tr>
                           <tr style={{ background: '#243060' }}>
-                            {['ID', 'Deliverable', 'Est. Hours', 'Est. Value'].map(h => (
+                            {['ID', 'Deliverable', ...(isOwner ? ['Est. Hours', 'Est. Value'] : [])].map(h => (
                               <th key={h} style={{ padding: '7px 13px', fontSize: 10, fontWeight: 600, color: '#adc4e0', letterSpacing: '0.06em', textTransform: 'uppercase', textAlign: h === 'Est. Hours' || h === 'Est. Value' ? 'center' : 'left', border: '1px solid #2a3a60' }}>
                                 {h}
                               </th>
@@ -474,12 +475,16 @@ export function WorkItemsPage() {
                                   <div style={{ fontSize: 11, color: '#7080a0', marginTop: 3, lineHeight: 1.5 }}>{nq.description}</div>
                                 )}
                               </td>
-                              <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', textAlign: 'center', color: '#4a5580', whiteSpace: 'nowrap', fontSize: 12 }}>
-                                {nq.est_hrs_lo != null ? (nq.est_hrs_lo === nq.est_hrs_hi ? `${fmtHrs(nq.est_hrs_lo)} hrs` : `${fmtHrs(nq.est_hrs_lo)}–${fmtHrs(nq.est_hrs_hi ?? 0)} hrs`) : '—'}
-                              </td>
-                              <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', textAlign: 'center', fontWeight: 600, color: '#1a4090', whiteSpace: 'nowrap', fontSize: 12 }}>
-                                {nq.est_value_lo != null ? (nq.est_value_lo === nq.est_value_hi ? fmtVal(nq.est_value_lo) : `${fmtVal(nq.est_value_lo)}–${fmtVal(nq.est_value_hi ?? 0)}`) : '—'}
-                              </td>
+                              {isOwner && (
+                                <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', textAlign: 'center', color: '#4a5580', whiteSpace: 'nowrap', fontSize: 12 }}>
+                                  {nq.est_hrs_lo != null ? (nq.est_hrs_lo === nq.est_hrs_hi ? `${fmtHrs(nq.est_hrs_lo)} hrs` : `${fmtHrs(nq.est_hrs_lo)}–${fmtHrs(nq.est_hrs_hi ?? 0)} hrs`) : '—'}
+                                </td>
+                              )}
+                              {isOwner && (
+                                <td style={{ padding: '9px 13px', border: '1px solid #dce2ef', textAlign: 'center', fontWeight: 600, color: '#1a4090', whiteSpace: 'nowrap', fontSize: 12 }}>
+                                  {nq.est_value_lo != null ? (nq.est_value_lo === nq.est_value_hi ? fmtVal(nq.est_value_lo) : `${fmtVal(nq.est_value_lo)}–${fmtVal(nq.est_value_hi ?? 0)}`) : '—'}
+                                </td>
+                              )}
                             </tr>
                           ))}
                         </tbody>
@@ -493,12 +498,16 @@ export function WorkItemsPage() {
                   <span style={{ fontSize: 12, fontWeight: 700, color: '#adc4e0', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     Total — {nqItems.length} Items Delivered
                   </span>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: '#7dc8f8' }}>
-                    {fmtHrs(totalHrsLo)}–{fmtHrs(totalHrsHi)} hrs
-                  </span>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: '#4cde9f' }}>
-                    {fmtVal(totalValLo)} – {fmtVal(totalValHi)}
-                  </span>
+                  {isOwner && (
+                    <span style={{ fontSize: 14, fontWeight: 800, color: '#7dc8f8' }}>
+                      {fmtHrs(totalHrsLo)}–{fmtHrs(totalHrsHi)} hrs
+                    </span>
+                  )}
+                  {isOwner && (
+                    <span style={{ fontSize: 14, fontWeight: 800, color: '#4cde9f' }}>
+                      {fmtVal(totalValLo)} – {fmtVal(totalValHi)}
+                    </span>
+                  )}
                 </div>
               </>
             )
