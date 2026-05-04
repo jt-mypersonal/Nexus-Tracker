@@ -209,9 +209,11 @@ export function WorkItemsPage() {
         <button style={tabStyle('items')} onClick={() => setMainTab('items')}>
           Work Items ({items.length})
         </button>
-        <button style={tabStyle('nq')} onClick={() => setMainTab('nq')}>
-          Complimentary Work {nqLoaded ? `(${nqItems.length})` : ''}
-        </button>
+        {isOwner && (
+          <button style={tabStyle('nq')} onClick={() => setMainTab('nq')}>
+            Complimentary Work {nqLoaded ? `(${nqItems.length})` : ''}
+          </button>
+        )}
         <button style={tabStyle('cr')} onClick={() => setMainTab('cr')}>
           Change Requests {crLoaded ? `(${changeRequests.length})` : ''}
         </button>
@@ -391,7 +393,7 @@ export function WorkItemsPage() {
       )}
 
       {/* ── NQ ITEMS TAB ── */}
-      {mainTab === 'nq' && (
+      {mainTab === 'nq' && isOwner && (
         <>
           <div style={{ background: '#fff8e4', border: '1px solid #f0d880', borderRadius: 8, padding: '12px 18px', marginBottom: 20, fontSize: 13, color: '#6a4800', lineHeight: 1.6 }}>
             <strong>Complimentary work delivered outside the Phase 2 proposal scope at no charge to NexusIntegrity.</strong>{' '}
