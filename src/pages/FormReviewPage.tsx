@@ -22,6 +22,7 @@ const FORM_COLORS: Record<string, string> = {
   rectifier:  '#8b5cf6',
   groundbed:  '#ef4444',
   drawing:    '#ec4899',
+  materials:  '#0d9488',   // teal — portal/PM tool
 }
 
 export function FormReviewPage() {

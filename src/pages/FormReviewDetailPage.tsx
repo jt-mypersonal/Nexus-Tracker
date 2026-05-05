@@ -22,7 +22,9 @@ function TypeBadge({ type }: { type: string }) {
     type === 'Multi-select'  ? { bg: '#052e16', fg: '#86efac' } :
     type === 'Toggle'     ? { bg: '#431407', fg: '#fdba74' } :
     type === 'Date'       ? { bg: '#0a2540', fg: '#67e8f9' } :
-    type.includes('Decimal') || type.includes('Integer') ? { bg: '#2e1065', fg: '#c4b5fd' } :
+    type.includes('Decimal') || type.includes('Integer') || type === 'Number' ? { bg: '#2e1065', fg: '#c4b5fd' } :
+    type === 'Table'      ? { bg: '#164e63', fg: '#67e8f9' } :
+    type === 'Button'     ? { bg: '#1e3a5f', fg: '#93c5fd' } :
     { bg: '#1e293b', fg: '#94a3b8' }
   return (
     <span style={{ background: color.bg, color: color.fg, fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 8, whiteSpace: 'nowrap' }}>

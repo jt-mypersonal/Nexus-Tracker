@@ -2,6 +2,7 @@ export type FieldType =
   | 'Text' | 'Multiline' | 'Decimal' | 'Integer' | 'Date'
   | 'Picker' | 'Multi-select' | 'Toggle' | 'Calculated' | 'Signature'
   | 'Photo' | 'Drawing' | 'Combo Picker' | '2-Tier Picker' | 'Time'
+  | 'Table' | 'Button' | 'Number' | '2-Tier Picker (Shunt)'
 
 export type RequiredLevel = 'YES' | 'COND' | 'NO'
 
@@ -9,7 +10,7 @@ export interface FormField {
   label: string
   type: FieldType
   required: RequiredLevel
-  sync: string | null  // null = tech enters it; string = source label from portal
+  sync: string | null  // mobile: source label from portal. portal forms: data origin / who fills it
   note?: string        // extra context shown under the field
 }
 
@@ -478,9 +479,148 @@ const drawing: FormDef = {
   ],
 }
 
+// ── Site Modal — Materials Sheet ─────────────────────────────────────────────
+// Covers the Materials tab in the web portal Site modal.
+// "sync" column = who fills this / where the data originates.
+
+const materials: FormDef = {
+  id: 'materials',
+  label: 'Materials Sheet (Portal)',
+  steps: [
+    {
+      title: 'General Controls',
+      stepNote: 'Top-level UX elements — navigation, save, and copy functionality.',
+      fields: [
+        { label: 'Copy From button',              type: 'Button',     required: 'NO',  sync: 'PM action',       note: 'Copies planned values from another site. Strips actuals. Only merges null-only fields.' },
+        { label: 'Save button',                   type: 'Button',     required: 'YES', sync: 'PM action',       note: 'POSTs all planned fields to server. Should not overwrite mobile actuals.' },
+        { label: 'Completion % indicator',        type: 'Calculated', required: 'NO',  sync: 'Auto-calculated', note: 'Shows X/Y of KEY_FIELD inputs filled. Count and denominator should be accurate.' },
+        { label: 'Missing field red tint',        type: 'Calculated', required: 'NO',  sync: 'Auto-calculated', note: 'KEY_FIELD inputs highlight red when empty. Verify all required planning fields are marked.' },
+        { label: 'Actuals — read-only enforcement', type: 'Calculated', required: 'YES', sync: 'Mobile → DB',  note: 'Actuals populated by field crew on mobile. Must not be editable by PM in the portal.' },
+      ],
+    },
+    {
+      title: 'Anode System',
+      stepNote: 'Anode brand, lead specs, and per-anode depth planning. Pre-populates the Ground Bed mobile form.',
+      fields: [
+        { label: 'Anode Brand',                   type: 'Picker',     required: 'YES', sync: 'PM-entered',      note: 'Drives brand label on ground bed PDF. Options: LORESCO, MMO, Graphite, Other.' },
+        { label: 'Anode Type',                    type: 'Picker',     required: 'YES', sync: 'PM-entered',      note: 'Drives anode size, length, and schematic geometry on the ground bed PDF.' },
+        { label: 'Number of Anodes',              type: 'Integer',    required: 'YES', sync: 'PM-entered',      note: 'Drives anode row count in Ground Bed mobile form and Anode Output in Rectifier mobile form.' },
+        { label: 'Anode Lead Size',               type: 'Picker',     required: 'NO',  sync: 'PM-entered' },
+        { label: 'Anode Lead Type',               type: 'Picker',     required: 'NO',  sync: 'PM-entered' },
+        { label: 'Anode Cable Spec',              type: 'Text',       required: 'NO',  sync: 'PM-entered',      note: 'Shows on schematic label. e.g. #8 Kynar.' },
+        { label: '#1 Lead Length (ft)',           type: 'Decimal',    required: 'NO',  sync: 'PM-entered' },
+        { label: 'Longest Lead (auto-calc)',       type: 'Calculated', required: 'NO',  sync: 'Auto-calculated', note: 'Max of all per-anode depths + lead length. Shown read-only.' },
+        { label: 'Anode depth rows (per anode)',  type: 'Table',      required: 'COND',sync: 'PM-entered',      note: 'One row per anode. Depth is auto-filled when schematic inputs (B, S, D, L) are complete.' },
+        { label: 'Anode depth actuals (mobile)',  type: 'Calculated', required: 'NO',  sync: 'Mobile → DB',     note: 'Read-only. Filled by field crew in Ground Bed Anode Log step.' },
+      ],
+    },
+    {
+      title: 'Fill Materials (Coke)',
+      stepNote: 'Coke breeze specifications for ground bed fill. Drives coke bag count on ground bed PDF.',
+      fields: [
+        { label: 'Coke Type',                     type: 'Picker',     required: 'YES', sync: 'PM-entered',      note: 'Options: Loresco SC-3/SS-3/EC-2/RS-3, CarboCoke, Petroleum Coke, etc.' },
+        { label: 'Bag Size / Container',          type: 'Text',       required: 'NO',  sync: 'PM-entered',      note: 'e.g. 50 lb bag. Used to compute coke weight on ground bed form.' },
+        { label: 'Planned Bag Quantity',          type: 'Integer',    required: 'YES', sync: 'PM-entered',      note: 'Planned number of bags to use.' },
+        { label: 'Active (per bag size)',         type: 'Toggle',     required: 'NO',  sync: 'PM-entered',      note: 'Marks which coke bag entries are active / in use.' },
+        { label: 'Actual Bag Quantity (mobile)',  type: 'Calculated', required: 'NO',  sync: 'Mobile → DB',     note: 'Read-only. Entered by field crew on Ground Bed mobile form.' },
+        { label: 'Coke Weight (calculated)',      type: 'Calculated', required: 'NO',  sync: 'Auto-calculated', note: 'Bags × unit weight. Shown read-only on form and PDF.' },
+      ],
+    },
+    {
+      title: 'Cement / Plug',
+      stepNote: 'Conditional section — only shown when plug is required. Gates further inputs.',
+      fields: [
+        { label: 'Include Cement Plug? (Yes/No)', type: 'Toggle',     required: 'NO',  sync: 'PM-entered',      note: 'When No, all cement plug fields are hidden and not required.' },
+        { label: 'Plug Depth (ft)',               type: 'Text',       required: 'COND',sync: 'PM-entered',      note: 'Shown when plug = Yes. Can be a range e.g. 325\'–225\'.' },
+        { label: 'Plug Length (ft)',              type: 'Decimal',    required: 'COND',sync: 'PM-entered' },
+        { label: 'Plug Type',                     type: 'Picker',     required: 'COND',sync: 'PM-entered',      note: 'Portland Type 1/2/3, High Early, Bentonite Grout, N/A, Other.' },
+      ],
+    },
+    {
+      title: 'Casing & Vent',
+      stepNote: 'Casing dimensions and vent pipe configuration. Vent length auto-calculates when possible.',
+      fields: [
+        { label: 'Casing Length (ft)',            type: 'Decimal',    required: 'NO',  sync: 'PM-entered',      note: 'Drives casing zone height on ground bed schematic.' },
+        { label: 'Casing Diameter (in)',          type: 'Text',       required: 'NO',  sync: 'PM-entered',      note: 'Bore diameter. Shows on schematic label.' },
+        { label: 'Casing Grout',                  type: 'Text',       required: 'NO',  sync: 'PM-entered' },
+        { label: 'Vent Type',                     type: 'Picker',     required: 'NO',  sync: 'PM-entered',      note: 'PVC / AllVent / N/A.' },
+        { label: 'Vent Size',                     type: 'Picker',     required: 'COND',sync: 'PM-entered',      note: 'AllVent: 1" / 1.25" / 2". PVC: text entry.' },
+        { label: 'Vent Length (ft)',              type: 'Calculated', required: 'COND',sync: 'Auto-calculated', note: 'AllVent: equals Top of Coke (auto-calc). PVC: manual entry. Drives schematic height.' },
+        { label: 'Double Vented',                 type: 'Toggle',     required: 'NO',  sync: 'PM-entered',      note: 'When on, schematic draws two vent pipes side by side.' },
+      ],
+    },
+    {
+      title: 'Wiring & Equipment',
+      stepNote: 'Shunt pickers for rectifier, RMU, and junction boxes. Values pre-fill the Rectifier mobile form.',
+      fields: [
+        { label: 'Rectifier shunt',               type: '2-Tier Picker (Shunt)', required: 'NO', sync: 'PM-entered', note: 'Brand → Model picker. Pre-fills Rectifier Report shunt fields on mobile.' },
+        { label: 'RMU model',                     type: 'Combo Picker', required: 'NO', sync: 'PM-entered',    note: 'Pre-fills RMU section in Rectifier mobile form.' },
+        { label: 'Anode J-Box shunt',             type: '2-Tier Picker (Shunt)', required: 'NO', sync: 'PM-entered', note: 'Pre-fills anode output shunt selection on mobile Rectifier.' },
+        { label: 'Neg J-Box shunt',               type: '2-Tier Picker (Shunt)', required: 'NO', sync: 'PM-entered', note: 'Pre-fills negative connection shunt selection on mobile Rectifier.' },
+        { label: 'Logging Volts',                 type: 'Decimal',    required: 'NO',  sync: 'PM-entered',      note: 'Pre-fills logging voltage on Ground Bed mobile form. Drives ohms calculation.' },
+        { label: 'Logging Instrument',            type: 'Picker',     required: 'NO',  sync: 'PM-entered',      note: 'Anode type used for logging. Pre-fills Ground Bed logging step.' },
+      ],
+    },
+    {
+      title: 'Ground Bed Geometry',
+      stepNote: 'Positioning inputs that drive anode depth auto-calc and schematic rendering on the Ground Bed form.',
+      fields: [
+        { label: 'Hole Depth (ft)',               type: 'Decimal',    required: 'YES', sync: 'PM-entered',      note: 'Total drilled depth. Drives drilling log row count on mobile.' },
+        { label: 'Interval (ft)',                 type: 'Decimal',    required: 'YES', sync: 'PM-entered',      note: 'Depth per log row. Row count = Depth ÷ Interval.' },
+        { label: 'Diameter (in)',                 type: 'Picker',     required: 'NO',  sync: 'PM-entered',      note: '6 / 8 / 10 / 12 / 14 in.' },
+        { label: 'Spacing from Bottom (B, ft)',   type: 'Decimal',    required: 'NO',  sync: 'PM-entered',      note: 'Distance from hole bottom to first anode CL. Required for schematic.' },
+        { label: 'Anode Spacing CL (S, ft)',      type: 'Decimal',    required: 'NO',  sync: 'PM-entered',      note: 'Centre-to-centre distance between anodes. Required for schematic.' },
+        { label: 'Top of Coke (ft)',              type: 'Decimal',    required: 'YES', sync: 'PM-entered',      note: 'Depth at which coke backfill starts. Drives schematic coke column.' },
+        { label: 'Bentonite Plug depth (ft)',     type: 'Decimal',    required: 'NO',  sync: 'PM-entered',      note: 'Surface seal depth. Shown on schematic as bentonite zone.' },
+        { label: 'Pea Gravel depth (ft)',         type: 'Decimal',    required: 'COND',sync: 'PM-entered',      note: 'Shown when Fill Material = Pea Gravel or Other. Drives fill zone on schematic.' },
+      ],
+    },
+    {
+      title: 'Equipment (Rental Planning)',
+      stepNote: 'Rental equipment planned for the site. Displayed as read-only context on mobile Daily form.',
+      fields: [
+        { label: 'Equipment type / description',  type: 'Text',       required: 'NO',  sync: 'PM-entered' },
+        { label: 'Planned quantity',              type: 'Integer',    required: 'NO',  sync: 'PM-entered' },
+        { label: 'Actual quantity (mobile)',      type: 'Calculated', required: 'NO',  sync: 'Mobile → DB', note: 'Read-only. Entered by field crew on Daily mobile form.' },
+        { label: 'Field-added equipment flag',    type: 'Calculated', required: 'NO',  sync: 'Mobile → DB', note: 'Items added by field crew not in the plan are flagged for PM review.' },
+      ],
+    },
+    {
+      title: 'Disposal',
+      stepNote: 'Waste disposal planning for the site.',
+      fields: [
+        { label: 'Disposal method',               type: 'Picker',     required: 'NO',  sync: 'PM-entered',      note: 'On-Site / Off-Site.' },
+        { label: 'Oil Field Vac',                 type: 'Toggle',     required: 'NO',  sync: 'PM-entered' },
+        { label: '70BBL',                         type: 'Toggle',     required: 'NO',  sync: 'PM-entered' },
+        { label: 'Notes',                         type: 'Multiline',  required: 'NO',  sync: 'PM-entered' },
+      ],
+    },
+    {
+      title: 'Materials Plan (Planned vs Actuals)',
+      stepNote: 'Summarised materials plan table showing planned quantities from PM and actuals from mobile submissions.',
+      fields: [
+        { label: 'Plan rows display',             type: 'Table',      required: 'NO',  sync: 'PM-entered',      note: 'Each row: Material Name, UOM, Planned Qty, Actual Qty, Variance.' },
+        { label: 'Planned Qty — read-only on mobile', type: 'Calculated', required: 'NO', sync: 'PM → mobile', note: 'Mobile shows planned as context only. Not editable by field crew.' },
+        { label: 'Actual Qty — populated from mobile', type: 'Calculated', required: 'NO', sync: 'Mobile → DB', note: 'Aggregated from material_ques table via fn_get_site_materials_plan.' },
+        { label: 'Variance display',              type: 'Calculated', required: 'NO',  sync: 'Auto-calculated', note: 'Planned − Actual. Shown as number. Negative = crew used more than planned.' },
+        { label: 'Field-added material rows',     type: 'Calculated', required: 'NO',  sync: 'Mobile → DB',     note: 'Items added by crew not in plan. Flagged for PM review. IsFieldAdded = true.' },
+      ],
+    },
+    {
+      title: 'Required Documents / Forms',
+      stepNote: 'Checklist of forms required to be completed for this site before site can move to Complete status.',
+      fields: [
+        { label: 'Required form list display',    type: 'Table',      required: 'NO',  sync: 'PM-configured',   note: 'PM sets which forms are required. Mobile shows requirement status.' },
+        { label: 'Skip with reason',              type: 'Button',     required: 'NO',  sync: 'Mobile action',   note: 'Field crew can skip a required form with a reason logged.' },
+        { label: 'Completion status display',     type: 'Calculated', required: 'NO',  sync: 'Auto-calculated', note: 'Each requirement shows pending/complete/skipped.' },
+      ],
+    },
+  ],
+}
+
 // ── Export ────────────────────────────────────────────────────────────────────
 
-export const FORMS: FormDef[] = [daily, tlreport, negative, rectifier, groundbed, drawing]
+export const FORMS: FormDef[] = [daily, tlreport, negative, rectifier, groundbed, drawing, materials]
 
 export function getForm(id: string): FormDef | undefined {
   return FORMS.find(f => f.id === id)
