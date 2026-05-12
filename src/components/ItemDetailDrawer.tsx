@@ -324,7 +324,7 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
                   <div style={{ fontSize: 11, fontWeight: 700, color: '#7080a0', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                     Notes
                   </div>
-                  <div style={{ fontSize: 13, color: '#2c3a58', lineHeight: 1.6, background: '#f8f9fc', borderRadius: 6, padding: '10px 14px' }}>
+                  <div style={{ fontSize: 13, color: '#2c3a58', lineHeight: 1.6, background: '#f8f9fc', borderRadius: 6, padding: '10px 14px', whiteSpace: 'pre-wrap' }}>
                     {item.notes}
                   </div>
                 </div>
@@ -415,7 +415,7 @@ export function ItemDetailDrawer({ item, onClose, onUpdated }: Props) {
                 {notes.length === 0 && <div style={{ color: '#9aa5be', fontSize: 13 }}>No notes yet.</div>}
                 {notes.map(n => (
                   <div key={n.id} style={{ background: '#f8f9fc', borderRadius: 6, padding: '10px 14px' }}>
-                    <div style={{ fontSize: 13, color: '#2c3a58', lineHeight: 1.6 }}>{n.content}</div>
+                    <div style={{ fontSize: 13, color: '#2c3a58', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{n.content}</div>
                     <div style={{ fontSize: 11, color: '#9aa5be', marginTop: 4 }}>
                       {n.author_email} &nbsp;|&nbsp; {new Date(n.created_at).toLocaleDateString()}
                     </div>
