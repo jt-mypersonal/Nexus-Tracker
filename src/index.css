@@ -26,6 +26,8 @@ body {
 .pill-blocked  { background: #fdecea; color: #900020; }
 .pill-uat      { background: #f0e8fc; color: #6020a0; }
 .pill-complete { background: #e4f5ee; color: #186040; }
+.pill-invoiced { background: #e0f7fa; color: #00695c; }
+.pill-paid     { background: #d1fae5; color: #065f46; }
 
 /* Category tag colors */
 .cat-1  { background: #fdecea; color: #900020; }

@@ -4,6 +4,8 @@ export type Status =
   | 'blocked'
   | 'uat'
   | 'complete'
+  | 'invoiced'
+  | 'paid'
 
 export const STATUS_LABELS: Record<Status, string> = {
   pending:  'Pending',
@@ -11,11 +13,18 @@ export const STATUS_LABELS: Record<Status, string> = {
   blocked:  'Blocked',
   uat:      'UAT',
   complete: 'Complete',
+  invoiced: 'Invoiced',
+  paid:     'Paid',
 }
 
 export const STATUS_ORDER: Status[] = [
-  'pending', 'ready', 'blocked', 'uat', 'complete',
+  'pending', 'ready', 'blocked', 'uat', 'complete', 'invoiced', 'paid',
 ]
+
+// Delivered work, regardless of billing stage -- used for progress/revenue
+// rollups so moving a task from Complete to Invoiced/Paid doesn't make it
+// disappear from "done" counts.
+export const DONE_STATUSES: Status[] = ['uat', 'complete', 'invoiced', 'paid']
 
 export const CATEGORY_LABELS: Record<string, string> = {
   'Cat 1':  'Cat 1 - Fix Existing Issues',

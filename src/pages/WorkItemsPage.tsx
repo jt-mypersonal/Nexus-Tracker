@@ -305,7 +305,7 @@ export function WorkItemsPage() {
                 {filtered.map((item, idx) => {
                   const isGroupStart = idx === 0 || filtered[idx - 1].group_label !== item.group_label
                   const isGroupEnd = idx === filtered.length - 1 || filtered[idx + 1].group_label !== item.group_label
-                  const allUatDone = uatReady.has(item.id) || item.status === 'complete'
+                  const allUatDone = uatReady.has(item.id) || (['complete', 'invoiced', 'paid'] as Status[]).includes(item.status)
                   const agg = groupAggregates[item.group_label ?? '']
                   return [
                     isGroupStart && (
