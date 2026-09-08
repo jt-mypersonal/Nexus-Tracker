@@ -1,6 +1,7 @@
 export type Status =
   | 'pending'
   | 'ready'
+  | 'in_process'
   | 'blocked'
   | 'uat'
   | 'complete'
@@ -8,17 +9,18 @@ export type Status =
   | 'paid'
 
 export const STATUS_LABELS: Record<Status, string> = {
-  pending:  'Pending',
-  ready:    'Ready',
-  blocked:  'Blocked',
-  uat:      'UAT',
-  complete: 'Complete',
-  invoiced: 'Invoiced',
-  paid:     'Paid',
+  pending:    'Pending',
+  ready:      'Ready',
+  in_process: 'In Process',
+  blocked:    'Blocked',
+  uat:        'UAT',
+  complete:   'Complete',
+  invoiced:   'Invoiced',
+  paid:       'Paid',
 }
 
 export const STATUS_ORDER: Status[] = [
-  'pending', 'ready', 'blocked', 'uat', 'complete', 'invoiced', 'paid',
+  'pending', 'ready', 'in_process', 'blocked', 'uat', 'complete', 'invoiced', 'paid',
 ]
 
 // Delivered work, regardless of billing stage -- used for progress/revenue

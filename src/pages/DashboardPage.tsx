@@ -5,13 +5,14 @@ import { STATUS_LABELS, DONE_STATUSES } from '../lib/types'
 import { StatusBadge } from '../components/StatusBadge'
 
 const STATUS_COLORS: Record<Status, string> = {
-  pending:  '#e06020',
-  ready:    '#3472c8',
-  blocked:  '#c82020',
-  uat:      '#6020a0',
-  complete: '#1f9e64',
-  invoiced: '#00897b',
-  paid:     '#0d8f57',
+  pending:    '#e06020',
+  ready:      '#3472c8',
+  in_process: '#d97706',
+  blocked:    '#c82020',
+  uat:        '#6020a0',
+  complete:   '#1f9e64',
+  invoiced:   '#00897b',
+  paid:       '#0d8f57',
 }
 
 const CAT_COLORS: Record<string, string> = {
@@ -99,8 +100,8 @@ export function DashboardPage() {
       </div>
 
       {/* Status strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 10, marginBottom: 20 }}>
-        {(['pending', 'ready', 'blocked', 'uat', 'complete', 'invoiced', 'paid'] as Status[]).map(s => (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 10, marginBottom: 20 }}>
+        {(['pending', 'ready', 'in_process', 'blocked', 'uat', 'complete', 'invoiced', 'paid'] as Status[]).map(s => (
           <div key={s} style={{ background: '#fff', borderRadius: 8, border: '1px solid #dce2ef', borderTop: `3px solid ${STATUS_COLORS[s]}`, padding: '12px 10px', textAlign: 'center' }}>
             <div style={{ fontSize: 24, fontWeight: 800, color: STATUS_COLORS[s], lineHeight: 1 }}>
               {byStatus[s]?.length ?? 0}
